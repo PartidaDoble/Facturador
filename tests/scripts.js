@@ -1,9 +1,9 @@
 const boleta = {
-  "cabecera": {
+  cabecera: {
     tipOperacion: "0101",
     fecEmision: "2021-06-28",
     horEmision: "10:20:14",
-    fecVencimiento: "-", // que pasa si se omite?
+    fecVencimiento: "-",
     codLocalEmisor: "0000",
     tipDocUsuario: "0",
     numDocUsuario: "00000000",
@@ -15,11 +15,11 @@ const boleta = {
     sumDescTotal: "0.00",
     sumOtrosCargos: "0.00",
     sumTotalAnticipos: "0.00",
-    sumImpVenta: "118.00", // que pasa si omito los decimales?
+    sumImpVenta: "118.00",
     ublVersionId: "2.1",
     customizationId: "2.0",
   },
-  "detalle": [
+  detalle: [
     {
       codUnidadMedida: "NIU",
       ctdUnidadItem: "2.00",
@@ -52,9 +52,16 @@ const boleta = {
   ],
 }
 
-console.log(JSON.stringify(boleta));
+// console.log(JSON.stringify(boleta));
+// console.log(quoteToDoubleQuote(JSON.stringify(boleta)));
 
-//console.log(quoteToDoubleQuote(JSON.stringify(boleta)));
+const {cabecera, detalle, tributos} = boleta
+console.log(quoteToDoubleQuote(JSON.stringify({cabecera})));
+console.log();
+console.log(quoteToDoubleQuote(JSON.stringify({detalle})));
+console.log();
+console.log(quoteToDoubleQuote(JSON.stringify({tributos})));
+console.log();
 
 function quoteToDoubleQuote(string) {
   return string.replace(/"/g, '""');
