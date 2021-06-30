@@ -2,47 +2,47 @@ Attribute VB_Name = "EntitiesTests"
 Option Explicit
 
 Sub un_item_deberia()
-    Dim item As New ItemEntity
-    
-    item.Quantity = 2
-    item.UnitValue = 50
-    
+    Dim Item As New ItemEntity
+
+    Item.Quantity = 2
+    Item.UnitValue = 50
+
     With Test.It("calcular su igv")
-        .AssertEquals 18, item.Igv
+        .AssertEquals 18, Item.Igv
     End With
-    
-    With Test.It("calcular su valor de venta de venta (cantidad * valor unitario)")
-        .AssertEquals 100, item.SaleValue
+
+    With Test.It("calcular su valor de venta (cantidad * valor unitario)")
+        .AssertEquals 100, Item.SaleValue
     End With
-    
+
     With Test.It("calcular su precio de de venta (cantidad * valor unitario + igv")
-        .AssertEquals 118, item.SalePrice
+        .AssertEquals 118, Item.SalePrice
     End With
 End Sub
 
 Sub una_factura_deberia()
-    Dim invoice As New InvoiceEntity
-    Dim item1 As New ItemEntity
-    Dim item2 As New ItemEntity
+    Dim Invoice As New InvoiceEntity
+    Dim Item1 As New ItemEntity
+    Dim Item2 As New ItemEntity
 
-    item1.Quantity = 2
-    item1.UnitValue = 50
-    
-    item2.Quantity = 4
-    item2.UnitValue = 50
-    
-    invoice.AddItem item1
-    invoice.AddItem item2
-    
+    Item1.Quantity = 2
+    Item1.UnitValue = 50
+
+    Item2.Quantity = 4
+    Item2.UnitValue = 50
+
+    Invoice.AddItem Item1
+    Invoice.AddItem Item2
+
     With Test.It("tener un valor de venta total igual a la suma del valor de venta de cada item")
-        .AssertEquals 300, invoice.SubTotal
+        .AssertEquals 300, Invoice.SubTotal
     End With
-    
+
     With Test.It("tener un IGV igual a la suma del IGV de cada item")
-        .AssertEquals 54, invoice.Igv
+        .AssertEquals 54, Invoice.Igv
     End With
 
     With Test.It("tener un precio de venta total igual a la suma del precio de venta de cada item")
-        .AssertEquals 354, invoice.Total
+        .AssertEquals 354, Invoice.Total
     End With
 End Sub

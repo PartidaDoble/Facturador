@@ -11,10 +11,6 @@ Option Explicit
 
 Private pRate As RateType
 
-Property Get Igv() As Double
-    Igv = 0.18
-End Property
-
 Property Get Rate() As RateType
     pRate.Igv = 0.18
     Rate = pRate

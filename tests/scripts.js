@@ -1,7 +1,7 @@
 const boleta = {
   cabecera: {
     tipOperacion: "0101",
-    fecEmision: "2021-06-28",
+    fecEmision: "2021-06-30",
     horEmision: "10:20:14",
     fecVencimiento: "-",
     codLocalEmisor: "0000",
@@ -35,7 +35,7 @@ const boleta = {
       nomTributoIgvItem: "IGV",
       codTipTributoIgvItem: "VAT",
       tipAfeIGV: "10",
-      porIgvItem: "18.0",
+      porIgvItem: "18.00",
 
       mtoPrecioVentaUnitario: "59.00", // (mtoValorVentaItem + mtoIgvItem ) / ctdUnidadItem
       mtoValorVentaItem: "100.00", // mtoValorUnitario * ctdUnidadItem

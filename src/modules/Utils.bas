@@ -6,11 +6,11 @@ Public Type RateType
 End Type
 
 Public Function Prop() As AppProperties
-    Dim properties As New AppProperties
-    Set Prop = properties
+    Dim Properties As New AppProperties
+    Set Prop = Properties
 End Function
 
 Public Function Test() As VBAUnit
-    Dim t As New VBAUnit
-    Set Test = t
+    Dim UnitTest As New VBAUnit
+    Set Test = UnitTest
 End Function
