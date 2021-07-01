@@ -11,7 +11,11 @@ Option Explicit
 
 Private pRate As RateType
 
-Property Get Rate() As RateType
+Public Property Get Rate() As RateType
     pRate.Igv = 0.18
     Rate = pRate
+End Property
+
+Public Property Get CodLocalEmisor() As String
+    CodLocalEmisor = "0000"
 End Property

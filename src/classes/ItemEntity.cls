@@ -13,14 +13,14 @@ Public Quantity As Integer
 Public UnitValue As Double
 Public Description As String
 
-Property Get Igv() As Double
+Public Property Get Igv() As Double
     Igv = Quantity * UnitValue * Prop.Rate.Igv
 End Property
 
-Property Get SaleValue() As Double
+Public Property Get SaleValue() As Double
     SaleValue = Quantity * UnitValue
 End Property
 
-Property Get SalePrice() As Double
+Public Property Get SalePrice() As Double
     SalePrice = Quantity * UnitValue + Igv
 End Property

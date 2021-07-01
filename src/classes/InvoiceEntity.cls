@@ -10,8 +10,13 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Private pItems As New Collection
+Public EmissionDate As Date
+Public EmissionTime As Date
+Public DueDate As Date
+Public Customer As New CustomerEntity
+Public TypeCurrency As String
 
-Property Get Total() As Double
+Public Property Get Total() As Double
     Dim Item As Variant
     Dim PriceSum As Double
     
@@ -22,7 +27,7 @@ Property Get Total() As Double
     Total = PriceSum
 End Property
 
-Property Get SubTotal() As Double
+Public Property Get SubTotal() As Double
     Dim Item As Variant
     Dim ValueSum As Double
     
@@ -33,7 +38,7 @@ Property Get SubTotal() As Double
     SubTotal = ValueSum
 End Property
 
-Property Get Igv() As Double
+Public Property Get Igv() As Double
     Dim Item As Variant
     Dim IgvSum As Double
     
@@ -44,11 +49,10 @@ Property Get Igv() As Double
     Igv = IgvSum
 End Property
 
-Public Sub AddItem(Item As ItemEntity)
-    pItems.Add Item
-End Sub
-
-Property Get Items() As Collection
+Public Property Get Items() As Collection
     Set Items = pItems
 End Property
 
+Public Sub AddItem(Item As ItemEntity)
+    pItems.Add Item
+End Sub
