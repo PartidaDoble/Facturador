@@ -48,7 +48,7 @@ Public Sub AddItem(Item As ItemEntity)
     pItems.Add Item
 End Sub
 
-Property Get Item() As ItemEntity
-    Set Item = pItems.Item(1)
+Property Get Items() As Collection
+    Set Items = pItems
 End Property
 

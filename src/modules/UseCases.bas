@@ -5,9 +5,10 @@ Public Function InvoiceToJson(Invoice As InvoiceEntity) As String
     Dim Data As New Dictionary
     Dim Cabecera As New Dictionary
     Dim Detalle As New Collection
-    Dim Item As New Dictionary
+    Dim DetalleItem As Dictionary
     Dim Tributos As New Collection
     Dim Igv As New Dictionary
+    Dim Item As Variant
 
     Cabecera.Add "tipOperacion", "0101"
     Cabecera.Add "fecEmision", "2021-06-30"
@@ -28,29 +29,32 @@ Public Function InvoiceToJson(Invoice As InvoiceEntity) As String
     Cabecera.Add "ublVersionId", "2.1"
     Cabecera.Add "customizationId", "2.0" ' revisar
 
-    Item.Add "codUnidadMedida", "NIU" ' catï¿½logo 3
-    Item.Add "ctdUnidadItem", Format(Invoice.Item.Quantity, "0.00")
-    Item.Add "codProducto", "CD0001"
-    Item.Add "codProductoSUNAT", "-" ' catï¿½logo 25
-    Item.Add "desItem", "Producto 1" ' descripciï¿½n del item
-    Item.Add "mtoValorUnitario", Format(Invoice.Item.UnitValue, "0.0000")
-    Item.Add "sumTotTributosItem", Format(Invoice.Item.Igv, "0.00") ' IGV + ISC ____
-    Item.Add "codTriIGV", "1000" ' catï¿½logo 5
-    Item.Add "mtoIgvItem", Format(Invoice.Item.Igv, "0.00")
-    Item.Add "mtoBaseIgvItem", Format(Invoice.Item.SaleValue, "0.00")
-    Item.Add "nomTributoIgvItem", "IGV" ' catï¿½logo 5 name
-    Item.Add "codTipTributoIgvItem", "VAT" ' catï¿½logo 5
-    Item.Add "tipAfeIGV", "10" ' catï¿½logo 7
-    Item.Add "porIgvItem", "18.00" ' tasa IGV ___
-    Item.Add "mtoPrecioVentaUnitario", "59.00" ' (mtoValorVentaItem + mtoIgvItem ) / ctdUnidadItem
-    Item.Add "mtoValorVentaItem", "100.00" ' mtoValorUnitario * ctdUnidadItem
-    Detalle.Add Item
+    For Each Item In Invoice.Items
+        Set DetalleItem = New Dictionary
+        DetalleItem.Add "codUnidadMedida", "NIU" ' catálogo 3
+        DetalleItem.Add "ctdUnidadItem", Format(Item.Quantity, "0.00")
+        DetalleItem.Add "codProducto", "CD0001"
+        DetalleItem.Add "codProductoSUNAT", "-" ' catálogo 25
+        DetalleItem.Add "desItem", Item.Description
+        DetalleItem.Add "mtoValorUnitario", Format(Item.UnitValue, "0.0000")
+        DetalleItem.Add "sumTotTributosItem", Format(Item.Igv, "0.00") ' IGV + ISC ____
+        DetalleItem.Add "codTriIGV", "1000" ' catálogo 5
+        DetalleItem.Add "mtoIgvItem", Format(Item.Igv, "0.00")
+        DetalleItem.Add "mtoBaseIgvItem", Format(Item.SaleValue, "0.00")
+        DetalleItem.Add "nomTributoIgvItem", "IGV" ' catálogo 5 name
+        DetalleItem.Add "codTipTributoIgvItem", "VAT" ' catálogo 5
+        DetalleItem.Add "tipAfeIGV", "10" ' catálogo 7
+        DetalleItem.Add "porIgvItem", "18.00" ' tasa IGV ___
+        DetalleItem.Add "mtoPrecioVentaUnitario", Format(Item.UnitValue + (Item.UnitValue * Prop.Rate.Igv), "0.00") ' mtoValorUnitario + mtoIgvUnitario
+        DetalleItem.Add "mtoValorVentaItem", Format(Item.Quantity * Item.UnitValue, "0.00") ' ctdUnidadItem * mtoValorUnitario
+        Detalle.Add DetalleItem
+    Next Item
 
-    Igv.Add "ideTributo", "1000" ' catï¿½logo 5
+    Igv.Add "ideTributo", "1000" ' catálogo 5
     Igv.Add "nomTributo", "IGV"
     Igv.Add "codTipTributo", "VAT"
-    Igv.Add "mtoBaseImponible", Format(Invoice.Item.SaleValue, "0.00")
-    Igv.Add "mtoTributo", Format(Invoice.Item.Igv, "0.00")
+    Igv.Add "mtoBaseImponible", Format(Invoice.SubTotal, "0.00")
+    Igv.Add "mtoTributo", Format(Invoice.Igv, "0.00")
     Tributos.Add Igv
 
     Data.Add "cabecera", Cabecera

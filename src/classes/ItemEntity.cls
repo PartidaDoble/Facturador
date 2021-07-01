@@ -11,6 +11,7 @@ Option Explicit
 
 Public Quantity As Integer
 Public UnitValue As Double
+Public Description As String
 
 Property Get Igv() As Double
     Igv = Quantity * UnitValue * Prop.Rate.Igv
