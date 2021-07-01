@@ -13,37 +13,42 @@ Private pItems As New Collection
 
 Property Get Total() As Double
     Dim Item As Variant
-    Dim priceSum As Double
+    Dim PriceSum As Double
     
     For Each Item In pItems
-        priceSum = priceSum + Item.SalePrice
+        PriceSum = PriceSum + Item.SalePrice
     Next Item
     
-    Total = priceSum
+    Total = PriceSum
 End Property
 
 Property Get SubTotal() As Double
     Dim Item As Variant
-    Dim valueSum As Double
+    Dim ValueSum As Double
     
     For Each Item In pItems
-        valueSum = valueSum + Item.SaleValue
+        ValueSum = ValueSum + Item.SaleValue
     Next Item
     
-    SubTotal = valueSum
+    SubTotal = ValueSum
 End Property
 
 Property Get Igv() As Double
     Dim Item As Variant
-    Dim igvSum As Double
+    Dim IgvSum As Double
     
     For Each Item In pItems
-        igvSum = igvSum + Item.Igv
+        IgvSum = IgvSum + Item.Igv
     Next Item
     
-    Igv = igvSum
+    Igv = IgvSum
 End Property
 
 Public Sub AddItem(Item As ItemEntity)
     pItems.Add Item
 End Sub
+
+Property Get Item() As ItemEntity
+    Set Item = pItems.Item(1)
+End Property
+
