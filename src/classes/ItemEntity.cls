@@ -9,8 +9,9 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Quantity As Integer
+Public Quantity As Long
 Public UnitValue As Double
+Public Code As String
 Public Description As String
 
 Public Property Get Igv() As Double

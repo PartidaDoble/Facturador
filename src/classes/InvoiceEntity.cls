@@ -9,33 +9,33 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Private pItems As New Collection
 Public EmissionDate As Date
 Public EmissionTime As Date
 Public DueDate As Date
-Public Customer As New CustomerEntity
 Public TypeCurrency As String
+Public Customer As New CustomerEntity
+Private pItems As New Collection
 
 Public Property Get Total() As Double
     Dim Item As Variant
     Dim PriceSum As Double
-    
+
     For Each Item In pItems
         PriceSum = PriceSum + Item.SalePrice
     Next Item
-    
+
     Total = PriceSum
 End Property
 
-Public Property Get SubTotal() As Double
+Public Property Get Subtotal() As Double
     Dim Item As Variant
     Dim ValueSum As Double
-    
+
     For Each Item In pItems
         ValueSum = ValueSum + Item.SaleValue
     Next Item
-    
-    SubTotal = ValueSum
+
+    Subtotal = ValueSum
 End Property
 
 Public Property Get Igv() As Double
