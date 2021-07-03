@@ -1,12 +1,14 @@
 Attribute VB_Name = "UseCases"
 Option Explicit
 
-Public Function InvoiceToJson(Invoice As InvoiceEntity) As String
+Public Function InvoiceToJson(Invoice As InvoiceEntity, Optional Pretty As Boolean = True) As String
     Dim Data As New Dictionary
     Dim Cabecera As New Dictionary
     Dim Detalle As New Collection
     Dim DetalleItem As Dictionary
     Dim Tributos As New Collection
+    Dim Leyendas As New Collection
+    Dim Leyenda As New Dictionary
     Dim Igv As New Dictionary
     Dim Item As Variant
 
@@ -15,12 +17,12 @@ Public Function InvoiceToJson(Invoice As InvoiceEntity) As String
     Cabecera.Add "horEmision", Format(Invoice.EmissionTime, "HH:mm:ss")
     Cabecera.Add "fecVencimiento", IIf(CInt(Invoice.DueDate) = 0, "-", Format(Invoice.DueDate, "yyyy-mm-dd"))
     Cabecera.Add "codLocalEmisor", Prop.CodLocalEmisor
-    Cabecera.Add "tipDocUsuario", IIf(Invoice.Customer.DocType = "", "1", Invoice.Customer.DocType) '"1"
-    Cabecera.Add "numDocUsuario", IIf(Invoice.Customer.DocNumber = "", "00000000", Invoice.Customer.DocNumber) '"00000000"
-    Cabecera.Add "rznSocialUsuario", IIf(Invoice.Customer.Name = "", "varios", Invoice.Customer.Name) '"varios"
+    Cabecera.Add "tipDocUsuario", IIf(Invoice.Customer.DocType = Empty, "1", Invoice.Customer.DocType) '"1"
+    Cabecera.Add "numDocUsuario", IIf(Invoice.Customer.DocNumber = Empty, "00000000", Invoice.Customer.DocNumber) '"00000000"
+    Cabecera.Add "rznSocialUsuario", IIf(Invoice.Customer.Name = Empty, "varios", Invoice.Customer.Name) '"varios"
     Cabecera.Add "tipMoneda", Invoice.TypeCurrency ' USD EUR
     Cabecera.Add "sumTotTributos", Format(Invoice.Igv, "0.00") ' sumatoria Tributos
-    Cabecera.Add "sumTotValVenta", Format(Invoice.SubTotal, "0.00") ' suma valor de venta de items
+    Cabecera.Add "sumTotValVenta", Format(Invoice.Subtotal, "0.00") ' suma valor de venta de items
     Cabecera.Add "sumPrecioVenta", Format(Invoice.Total, "0.00") ' suma precio de venta de items
     Cabecera.Add "sumDescTotal", "0.00"
     Cabecera.Add "sumOtrosCargos", "0.00"
@@ -33,10 +35,10 @@ Public Function InvoiceToJson(Invoice As InvoiceEntity) As String
         Set DetalleItem = New Dictionary
         DetalleItem.Add "codUnidadMedida", "NIU" ' catálogo 3
         DetalleItem.Add "ctdUnidadItem", Format(Item.Quantity, "0.00")
-        DetalleItem.Add "codProducto", "CD0001"
+        DetalleItem.Add "codProducto", Item.Code
         DetalleItem.Add "codProductoSUNAT", "-" ' catálogo 25
         DetalleItem.Add "desItem", Item.Description
-        DetalleItem.Add "mtoValorUnitario", Format(Item.UnitValue, "0.0000")
+        DetalleItem.Add "mtoValorUnitario", Format(Item.UnitValue, "0.0000000000")
         DetalleItem.Add "sumTotTributosItem", Format(Item.Igv, "0.00") ' IGV + ISC ____
         DetalleItem.Add "codTriIGV", "1000" ' catálogo 5
         DetalleItem.Add "mtoIgvItem", Format(Item.Igv, "0.00")
@@ -53,13 +55,22 @@ Public Function InvoiceToJson(Invoice As InvoiceEntity) As String
     Igv.Add "ideTributo", "1000" ' catálogo 5
     Igv.Add "nomTributo", "IGV"
     Igv.Add "codTipTributo", "VAT"
-    Igv.Add "mtoBaseImponible", Format(Invoice.SubTotal, "0.00")
+    Igv.Add "mtoBaseImponible", Format(Invoice.Subtotal, "0.00")
     Igv.Add "mtoTributo", Format(Invoice.Igv, "0.00")
     Tributos.Add Igv
+    
+    Leyenda.Add "codLeyenda", "1000"
+    Leyenda.Add "desLeyenda", AmountInLetters(Invoice.Total, Invoice.TypeCurrency)
+    Leyendas.Add Leyenda
 
     Data.Add "cabecera", Cabecera
     Data.Add "detalle", Detalle
     Data.Add "tributos", Tributos
+    Data.Add "leyendas", Leyendas
 
-    InvoiceToJson = ConvertToJson(Data)
+    If Pretty Then
+        InvoiceToJson = ConvertToJson(Data, 2)
+    Else
+        InvoiceToJson = ConvertToJson(Data)
+    End If
 End Function
