@@ -1,7 +1,12 @@
 Attribute VB_Name = "EntitiesTests"
 Option Explicit
 
-Sub un_item_deberia()
+Private Sub RunAllModuleTests()
+    un_item_deberia
+    una_factura_deberia
+End Sub
+
+Private Sub un_item_deberia()
     Dim Item As New ItemEntity
 
     Item.Quantity = 2
@@ -20,7 +25,7 @@ Sub un_item_deberia()
     End With
 End Sub
 
-Sub una_factura_deberia()
+Private Sub una_factura_deberia()
     Dim Invoice As New InvoiceEntity
     Dim Item1 As New ItemEntity
     Dim Item2 As New ItemEntity
@@ -35,7 +40,7 @@ Sub una_factura_deberia()
     Invoice.AddItem Item2
 
     With Test.It("tener un valor de venta total igual a la suma del valor de venta de cada item")
-        .AssertEquals 300, Invoice.SubTotal
+        .AssertEquals 300, Invoice.Subtotal
     End With
 
     With Test.It("tener un IGV igual a la suma del IGV de cada item")
