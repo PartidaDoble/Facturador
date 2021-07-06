@@ -9,13 +9,15 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
+Public Code As String
+
+Public UnitMeasurement As String
+
+Public Description As String
+
 Public Quantity As Long
 
 Public UnitValue As Double
-
-Public Code As String
-
-Public Description As String
 
 Public Property Get Igv() As Double
     Igv = Quantity * UnitValue * Prop.Rate.Igv

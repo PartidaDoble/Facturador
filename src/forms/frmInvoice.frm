@@ -14,6 +14,14 @@ Attribute VB_PredeclaredId = True
 Attribute VB_Exposed = False
 Option Explicit
 
+Private Sub cmdSearchCustomer_Click()
+    frmSearchCustomer.Show
+End Sub
+
+Private Sub txtDocNumber_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+    KeyAscii = OnlyInteger(KeyAscii)
+End Sub
+
 Private Sub UserForm_Initialize()
     frmInvoice.Caption = "BOLETA DE VENTA"
     txtEmissionDate = Format(Date, "dd/mm/yyyy")
@@ -31,8 +39,7 @@ End Sub
 
 Private Sub lstItems_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
     On Error Resume Next
-    Dim Question As Integer
-
+    
     If lstItems.ListCount < 1 Then Exit Sub
 
     If KeyCode = 46 Then
@@ -43,28 +50,37 @@ Private Sub lstItems_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
 End Sub
 
 Private Sub cmdSave_Click()
-    On Error GoTo HandleErrors
     Dim Invoice As New InvoiceEntity
     Dim Item As ItemEntity
-    Dim Row As Integer
+    Dim Index As Integer
 
-    If Not FieldsValid Then Exit Sub
+    If Not ValidFields Then Exit Sub
     
     Invoice.EmissionDate = DateValue(txtEmissionDate)
     Invoice.EmissionTime = Time
+    
     If cboTypeCurrency = "Soles" Then Invoice.TypeCurrency = AppTypeCurrencyPEN
     If cboTypeCurrency = "Dólares" Then Invoice.TypeCurrency = AppTypeCurrencyUSD
     
-    With frmInvoice.lstItems
-        For Row = 0 To .ListCount - 1
+    If txtDocType = "01" Then Invoice.DocType = AppDocTypeFactura
+    If txtDocType = "03" Then Invoice.DocType = AppDocTypeBoletaVenta
+    
+    If txtCustomerDocType = "1" Then Invoice.Customer.DocType = AppTypeDocIdentyDNI
+    If txtCustomerDocType = "6" Then Invoice.Customer.DocType = AppTypeDocIdentyRUC
+    Invoice.Customer.DocNumber = txtCustomerDocNumber
+    Invoice.Customer.Name = txtCustomerName
+    
+    With lstItems
+        For Index = 0 To .ListCount - 1
             Set Item = New ItemEntity
-            Item.Code = "1000"
-            Item.Description = Trim(.List(Row, 0))
-            Item.Quantity = .List(Row, 1)
-            Item.UnitValue = TaxLess(.List(Row, 2), Prop.Rate.Igv)
+            Item.Code = .List(Index, 4)
+            Item.UnitMeasurement = .List(Index, 5)
+            Item.Description = Trim(.List(Index, 0))
+            Item.Quantity = .List(Index, 1)
+            Item.UnitValue = TaxLess(.List(Index, 2), Prop.Rate.Igv)
             
             Invoice.AddItem Item
-        Next Row
+        Next Index
     End With
 
     Debug.Print InvoiceToJson(Invoice)
@@ -72,23 +88,40 @@ Private Sub cmdSave_Click()
     MsgBox "El documento electrónico se generó correctamente.", vbInformation, "Documento generado"
     Unload Me
     Exit Sub
-    
-HandleErrors:
-    MsgBox Err.Description, vbCritical, "Debe ingresar los datos del cliente."
 End Sub
 
-Private Function FieldsValid() As Boolean
-    If txtDocNumber = Empty Then
-        MsgBox "Debe ingresar el número del comprobante.", vbInformation, "Número de documento"
+Private Function ValidFields() As Boolean
+    If Trim(txtDocNumber) = Empty And Not IsNumeric(Trim(txtDocNumber)) Then
+        MsgBox "Debe ingresar el número del comprobante.", vbExclamation, "Subsane la observación"
         txtDocNumber.SetFocus
         Exit Function
     End If
+    If txtDocType = "03" And lblTotal > 700 And Trim(txtCustomerDocNumber) = Empty And Trim(txtCustomerName) = Empty Then
+        MsgBox "El total de la venta es mayor a 700 soles. Debe ingresar el DNI y los apellidos y nombres del cliente.", vbExclamation, "Subsane la observación"
+        cmdSearchCustomer.SetFocus
+        Exit Function
+    End If
+    If txtDocType = "01" And Trim(txtCustomerDocNumber) = Empty And Trim(txtCustomerName) = Empty Then
+        MsgBox "Debe ingresar el RUC y el nombre del cliente.", vbExclamation, "Subsane la observación"
+        cmdSearchCustomer.SetFocus
+        Exit Function
+    End If
+    If txtCustomerDocType = "1" And Len(txtCustomerDocNumber) <> 11 Then
+        MsgBox "El número de RUC debe tener 11 dígitos.", vbExclamation, "Subsane la observación"
+        cmdSearchCustomer.SetFocus
+        Exit Function
+    End If
+    If txtCustomerDocType = "3" And txtCustomerDocNumber <> Empty And Len(txtCustomerDocNumber) <> 8 Then
+        MsgBox "La boleta de venta debe tener 8 dígitos.", vbExclamation, "Subsane la observación"
+        cmdSearchCustomer.SetFocus
+        Exit Function
+    End If
     If lstItems.ListCount < 1 Then
-        MsgBox "Debe ingresar al menos un producto.", vbInformation, "Ingrese productos"
+        MsgBox "Debe ingresar productos para vender.", vbExclamation, "Subsane la observación"
         Exit Function
     End If
     
-    FieldsValid = True
+    ValidFields = True
 End Function
 
 Private Sub cmdCancel_Click()

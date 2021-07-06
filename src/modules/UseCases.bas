@@ -17,10 +17,12 @@ Public Function InvoiceToJson(Invoice As InvoiceEntity, Optional Pretty As Boole
     Cabecera.Add "horEmision", Format(Invoice.EmissionTime, "HH:mm:ss")
     Cabecera.Add "fecVencimiento", IIf(CInt(Invoice.DueDate) = 0, "-", Format(Invoice.DueDate, "yyyy-mm-dd"))
     Cabecera.Add "codLocalEmisor", Prop.CodLocalEmisor
-    Cabecera.Add "tipDocUsuario", IIf(Invoice.Customer.DocType = Empty, "1", Invoice.Customer.DocType) '"1"
-    Cabecera.Add "numDocUsuario", IIf(Invoice.Customer.DocNumber = Empty, "00000000", Invoice.Customer.DocNumber) '"00000000"
-    Cabecera.Add "rznSocialUsuario", IIf(Invoice.Customer.Name = Empty, "varios", Invoice.Customer.Name) '"varios"
-    Cabecera.Add "tipMoneda", IIf(Invoice.TypeCurrency = AppTypeCurrencyPEN, "PEN", "USD") ' USD EUR
+    If Invoice.Customer.DocType = AppTypeDocIdentyDNI Then Cabecera.Add "tipDocUsuario", "1"
+    If Invoice.Customer.DocType = AppTypeDocIdentyRUC Then Cabecera.Add "tipDocUsuario", "6"
+    Cabecera.Add "numDocUsuario", IIf(Invoice.Customer.DocNumber = Empty, "00000000", Invoice.Customer.DocNumber)
+    Cabecera.Add "rznSocialUsuario", IIf(Invoice.Customer.Name = Empty, "varios", Invoice.Customer.Name)
+    If Invoice.TypeCurrency = AppTypeCurrencyPEN Then Cabecera.Add "tipMoneda", "PEN"
+    If Invoice.TypeCurrency = AppTypeCurrencyUSD Then Cabecera.Add "tipMoneda", "USD"
     Cabecera.Add "sumTotTributos", Format(Invoice.Igv, "0.00") ' sumatoria Tributos
     Cabecera.Add "sumTotValVenta", Format(Invoice.SubTotal, "0.00") ' suma valor de venta de items
     Cabecera.Add "sumPrecioVenta", Format(Invoice.Total, "0.00") ' suma precio de venta de items

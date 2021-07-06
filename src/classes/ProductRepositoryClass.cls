@@ -14,19 +14,34 @@ Public Function GetAll() As Collection
     Dim Product2 As New ProductEntity
     Dim Product3 As New ProductEntity
     Dim Products As New Collection
+    Dim Product As ProductEntity
+    Dim i As Integer
 
+    Product1.Code = "C0345"
+    Product1.UnitMeasurement = "NIU"
     Product1.Description = "Producto foo 1Producto foo 1Producto foo 1Producto foo 1Producto foo 1Producto foo 1"
     Product1.UnitPrice = 2234025.2
-    
+
+    Product2.Code = "C0346"
+    Product2.UnitMeasurement = "NIU"
     Product2.Description = "Producto bar 2"
     Product2.UnitPrice = 900000.22
     
+    Product3.Code = "C0347"
+    Product3.UnitMeasurement = "NIU"
     Product3.Description = "Producto baz 3"
     Product3.UnitPrice = 15.33
     
     Products.Add Product1
     Products.Add Product2
     Products.Add Product3
+    
+    For i = 1 To 10
+        Set Product = New ProductEntity
+        Product.Description = "PRODUCTO 1"
+        Product.UnitPrice = 33.4
+        Products.Add Product
+    Next
     
     Set GetAll = Products
 End Function

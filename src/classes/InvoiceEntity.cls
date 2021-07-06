@@ -30,10 +30,6 @@ Public Property Get Total() As Double
     For Each Item In pItems
         PriceSum = PriceSum + Item.SalePrice
     Next Item
-    
-    If DocType = AppDocTypeBoletaVenta And PriceSum > 700 And Customer.DocNumber = Empty And Customer.Name = Empty Then
-        Err.Raise AppErrorBVMayor700Soles, , "Total de la venta mayor a 700 soles. Debe ingresar el DNI y los apellidos y nombres del cliente."
-    End If
 
     Total = PriceSum
 End Property

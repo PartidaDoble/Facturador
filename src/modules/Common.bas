@@ -16,6 +16,7 @@ End Enum
 
 Public Enum AppDocType
     AppDocTypeBoletaVenta
+    AppDocTypeFactura
 End Enum
 
 Public Enum AppTypeDocIdenty
@@ -32,3 +33,11 @@ Public Function Test() As VBAUnit
     Dim UnitTest As New VBAUnit
     Set Test = UnitTest
 End Function
+
+Sub Fun()
+    Dim i As Integer
+    
+    For i = 1 To 100
+        Debug.Print i
+    Next
+End Sub

@@ -51,26 +51,3 @@ Private Sub una_factura_deberia()
         .AssertEquals 354, Invoice.Total
     End With
 End Sub
-
-Private Sub una_boleta_de_venta_con_total_mayor_a_700_soles_debería()
-    On Error GoTo HandleErrors
-    Dim Invoice As New InvoiceEntity
-    Dim Item As New ItemEntity
-
-    Item.Quantity = 1
-    Item.UnitValue = 1000
-    
-    Invoice.DocType = AppDocTypeBoletaVenta
-    Invoice.Customer.DocType = AppTypeDocIdentyDNI
-    Invoice.Customer.DocNumber = "45184578"
-    Invoice.Customer.Name = "APELLIDOS Y NOMBRES"
-    Invoice.AddItem Item
-    
-    Debug.Print Invoice.Total
-    Exit Sub
-
-HandleErrors:
-    With Test.It("tener informacion del cliente: DNI y apellidos y nombres")
-        .AssertEquals AppErrorBVMayor700Soles, Err.Number
-    End With
-End Sub
