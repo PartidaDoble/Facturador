@@ -23,7 +23,7 @@ Public Function AmountInLetters(Amount As Double, TypeCurrency As AppTypeCurrenc
     WholePartInLetters = UCase(NumberToWords(WholePart))
     DecimalPartInLetters = "CON " & Format(DecimalPart, "00") & "/100"
     If TypeCurrency = AppTypeCurrencyPEN Then CurrencyName = "SOLES"
-    If TypeCurrency = AppTypeCurrencyUSD Then CurrencyName = "DÓLARES AMERICANOS"
+    If TypeCurrency = AppTypeCurrencyUSD Then CurrencyName = "DOLARES AMERICANOS"
     
     AmountInLetters = WholePartInLetters & " " & DecimalPartInLetters & " " & CurrencyName
 

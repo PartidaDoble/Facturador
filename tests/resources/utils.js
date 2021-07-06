@@ -5,4 +5,3 @@ function quoteToDoubleQuote(string) {
 module.exports = {
   quoteToDoubleQuote
 }
-
