@@ -20,9 +20,9 @@ Public Function InvoiceToJson(Invoice As InvoiceEntity, Optional Pretty As Boole
     Cabecera.Add "tipDocUsuario", IIf(Invoice.Customer.DocType = Empty, "1", Invoice.Customer.DocType) '"1"
     Cabecera.Add "numDocUsuario", IIf(Invoice.Customer.DocNumber = Empty, "00000000", Invoice.Customer.DocNumber) '"00000000"
     Cabecera.Add "rznSocialUsuario", IIf(Invoice.Customer.Name = Empty, "varios", Invoice.Customer.Name) '"varios"
-    Cabecera.Add "tipMoneda", Invoice.TypeCurrency ' USD EUR
+    Cabecera.Add "tipMoneda", IIf(Invoice.TypeCurrency = AppTypeCurrencyPEN, "PEN", "USD") ' USD EUR
     Cabecera.Add "sumTotTributos", Format(Invoice.Igv, "0.00") ' sumatoria Tributos
-    Cabecera.Add "sumTotValVenta", Format(Invoice.Subtotal, "0.00") ' suma valor de venta de items
+    Cabecera.Add "sumTotValVenta", Format(Invoice.SubTotal, "0.00") ' suma valor de venta de items
     Cabecera.Add "sumPrecioVenta", Format(Invoice.Total, "0.00") ' suma precio de venta de items
     Cabecera.Add "sumDescTotal", "0.00"
     Cabecera.Add "sumOtrosCargos", "0.00"
@@ -38,7 +38,7 @@ Public Function InvoiceToJson(Invoice As InvoiceEntity, Optional Pretty As Boole
         DetalleItem.Add "codProducto", Item.Code
         DetalleItem.Add "codProductoSUNAT", "-" ' catálogo 25
         DetalleItem.Add "desItem", Item.Description
-        DetalleItem.Add "mtoValorUnitario", Format(Item.UnitValue, "0.0000000000")
+        DetalleItem.Add "mtoValorUnitario", Format(Item.UnitValue, "0.00000000")
         DetalleItem.Add "sumTotTributosItem", Format(Item.Igv, "0.00") ' IGV + ISC ____
         DetalleItem.Add "codTriIGV", "1000" ' catálogo 5
         DetalleItem.Add "mtoIgvItem", Format(Item.Igv, "0.00")
@@ -55,7 +55,7 @@ Public Function InvoiceToJson(Invoice As InvoiceEntity, Optional Pretty As Boole
     Igv.Add "ideTributo", "1000" ' catálogo 5
     Igv.Add "nomTributo", "IGV"
     Igv.Add "codTipTributo", "VAT"
-    Igv.Add "mtoBaseImponible", Format(Invoice.Subtotal, "0.00")
+    Igv.Add "mtoBaseImponible", Format(Invoice.SubTotal, "0.00")
     Igv.Add "mtoTributo", Format(Invoice.Igv, "0.00")
     Tributos.Add Igv
     

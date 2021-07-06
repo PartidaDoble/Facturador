@@ -10,10 +10,17 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Public EmissionDate As Date
+
 Public EmissionTime As Date
+
 Public DueDate As Date
-Public TypeCurrency As String
+
+Public TypeCurrency As AppTypeCurrency
+
+Public DocType As AppDocType
+
 Public Customer As New CustomerEntity
+
 Private pItems As New Collection
 
 Public Property Get Total() As Double
@@ -23,11 +30,15 @@ Public Property Get Total() As Double
     For Each Item In pItems
         PriceSum = PriceSum + Item.SalePrice
     Next Item
+    
+    If DocType = AppDocTypeBoletaVenta And PriceSum > 700 And Customer.DocNumber = Empty And Customer.Name = Empty Then
+        Err.Raise AppErrorBVMayor700Soles, , "Total de la venta mayor a 700 soles. Debe ingresar el DNI y los apellidos y nombres del cliente."
+    End If
 
     Total = PriceSum
 End Property
 
-Public Property Get Subtotal() As Double
+Public Property Get SubTotal() As Double
     Dim Item As Variant
     Dim ValueSum As Double
 
@@ -35,7 +46,7 @@ Public Property Get Subtotal() As Double
         ValueSum = ValueSum + Item.SaleValue
     Next Item
 
-    Subtotal = ValueSum
+    SubTotal = ValueSum
 End Property
 
 Public Property Get Igv() As Double

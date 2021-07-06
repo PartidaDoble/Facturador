@@ -40,7 +40,7 @@ Private Sub una_factura_deberia()
     Invoice.AddItem Item2
 
     With Test.It("tener un valor de venta total igual a la suma del valor de venta de cada item")
-        .AssertEquals 300, Invoice.Subtotal
+        .AssertEquals 300, Invoice.SubTotal
     End With
 
     With Test.It("tener un IGV igual a la suma del IGV de cada item")
@@ -49,5 +49,28 @@ Private Sub una_factura_deberia()
 
     With Test.It("tener un precio de venta total igual a la suma del precio de venta de cada item")
         .AssertEquals 354, Invoice.Total
+    End With
+End Sub
+
+Private Sub una_boleta_de_venta_con_total_mayor_a_700_soles_debería()
+    On Error GoTo HandleErrors
+    Dim Invoice As New InvoiceEntity
+    Dim Item As New ItemEntity
+
+    Item.Quantity = 1
+    Item.UnitValue = 1000
+    
+    Invoice.DocType = AppDocTypeBoletaVenta
+    Invoice.Customer.DocType = AppTypeDocIdentyDNI
+    Invoice.Customer.DocNumber = "45184578"
+    Invoice.Customer.Name = "APELLIDOS Y NOMBRES"
+    Invoice.AddItem Item
+    
+    Debug.Print Invoice.Total
+    Exit Sub
+
+HandleErrors:
+    With Test.It("tener informacion del cliente: DNI y apellidos y nombres")
+        .AssertEquals AppErrorBVMayor700Soles, Err.Number
     End With
 End Sub

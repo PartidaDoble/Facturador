@@ -2,21 +2,21 @@ Attribute VB_Name = "FormsHelpers"
 Option Explicit
 
 Public Sub FrmInvoiceShowInformation()
-    Dim TypeCurrency As String
+    Dim TypeCurrency As AppTypeCurrency
     Dim TotalPrice As Double
-    Dim Subtotal As Double
+    Dim SubTotal As Double
     Dim Igv As Double
 
     TotalPrice = FrmInvoiceSumTotalItems
-    Subtotal = TotalPrice / (Prop.Rate.Igv + 1)
-    Igv = TotalPrice - Subtotal
+    SubTotal = TotalPrice / (Prop.Rate.Igv + 1)
+    Igv = TotalPrice - SubTotal
 
-    frmInvoice.lblSubTotal = Format(Subtotal, "#,##0.00")
+    frmInvoice.lblSubTotal = Format(SubTotal, "#,##0.00")
     frmInvoice.lblIGV = Format(Igv, "#,##0.00")
     frmInvoice.lblTotal = Format(TotalPrice, "#,##0.00")
 
-    If frmInvoice.cboTypeCurrency = "Soles" Then TypeCurrency = "PEN"
-    If frmInvoice.cboTypeCurrency = "Dólares" Then TypeCurrency = "USD"
+    If frmInvoice.cboTypeCurrency = "Soles" Then TypeCurrency = AppTypeCurrencyPEN
+    If frmInvoice.cboTypeCurrency = "Dólares" Then TypeCurrency = AppTypeCurrencyUSD
     frmInvoice.lblTotalInLetters.Caption = "SON: " & AmountInLetters(TotalPrice, TypeCurrency)
 End Sub
 

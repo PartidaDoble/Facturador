@@ -9,6 +9,8 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public DocType As String
+Public DocType As AppTypeDocIdenty
+
 Public DocNumber As String
+
 Public Name As String

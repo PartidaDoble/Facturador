@@ -9,10 +9,10 @@ End Sub
 
 Private Sub AmountInLettersTest()
     With Test.It("AmountInLettersTest")
-        .AssertEquals "UN CON 00/100 SOLES", AmountInLetters(1, "PEN")
-        .AssertEquals "CIENTO CINCUENTA Y TRES CON 45/100 SOLES", AmountInLetters(153.45, "PEN")
-        .AssertEquals "UN MIL OCHOCIENTOS CUARENTA Y CINCO CON 40/100 SOLES", AmountInLetters(1845.4, "PEN")
-        .AssertEquals "TREINTA Y CINCO MIL OCHOCIENTOS SESENTA Y DOS CON 80/100 DÓLARES AMERICANOS", AmountInLetters(35862.8, "USD")
+        .AssertEquals "UN CON 00/100 SOLES", AmountInLetters(1, AppTypeCurrencyPEN)
+        .AssertEquals "CIENTO CINCUENTA Y TRES CON 45/100 SOLES", AmountInLetters(153.45, AppTypeCurrencyPEN)
+        .AssertEquals "UN MIL OCHOCIENTOS CUARENTA Y CINCO CON 40/100 SOLES", AmountInLetters(1845.4, AppTypeCurrencyPEN)
+        .AssertEquals "TREINTA Y CINCO MIL OCHOCIENTOS SESENTA Y DOS CON 80/100 DÓLARES AMERICANOS", AmountInLetters(35862.8, AppTypeCurrencyUSD)
     End With
 End Sub
 

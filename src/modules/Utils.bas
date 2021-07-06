@@ -9,7 +9,7 @@ Public Function TaxPlus(TaxBase As Double, TaxRate As Double) As Double
     TaxPlus = TaxBase + TaxBase * TaxRate
 End Function
 
-Public Function AmountInLetters(Amount As Double, TypeCurrency As String) As String
+Public Function AmountInLetters(Amount As Double, TypeCurrency As AppTypeCurrency) As String
     On Error Resume Next
     Dim WholePart As Long
     Dim DecimalPart As Long
@@ -22,8 +22,8 @@ Public Function AmountInLetters(Amount As Double, TypeCurrency As String) As Str
 
     WholePartInLetters = UCase(NumberToWords(WholePart))
     DecimalPartInLetters = "CON " & Format(DecimalPart, "00") & "/100"
-    If TypeCurrency = "PEN" Then CurrencyName = "SOLES"
-    If TypeCurrency = "USD" Then CurrencyName = "DÓLARES AMERICANOS"
+    If TypeCurrency = AppTypeCurrencyPEN Then CurrencyName = "SOLES"
+    If TypeCurrency = AppTypeCurrencyUSD Then CurrencyName = "DÓLARES AMERICANOS"
     
     AmountInLetters = WholePartInLetters & " " & DecimalPartInLetters & " " & CurrencyName
 

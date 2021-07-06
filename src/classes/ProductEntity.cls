@@ -10,4 +10,5 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Public Description As String
+
 Public UnitPrice As Double

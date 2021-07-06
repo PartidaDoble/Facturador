@@ -19,7 +19,7 @@ Public Function GetAll() As Collection
     Product1.UnitPrice = 2234025.2
     
     Product2.Description = "Producto bar 2"
-    Product2.UnitPrice = 1545.22
+    Product2.UnitPrice = 900000.22
     
     Product3.Description = "Producto baz 3"
     Product3.UnitPrice = 15.33

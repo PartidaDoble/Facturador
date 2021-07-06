@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmInvoice 
-   ClientHeight    =   6615
+   ClientHeight    =   6645
    ClientLeft      =   45
    ClientTop       =   390
    ClientWidth     =   10170
@@ -36,44 +36,48 @@ Private Sub lstItems_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift
     If lstItems.ListCount < 1 Then Exit Sub
 
     If KeyCode = 46 Then
-        Question = MsgBox("¿Está seguro que desea eliminar el producto?", _
-                        vbYesNo + vbQuestion, "Eliminar producto")
-        If Question = vbYes Then lstItems.RemoveItem lstItems.ListIndex
+        lstItems.RemoveItem lstItems.ListIndex
     End If
 
     FrmInvoiceShowInformation
 End Sub
 
 Private Sub cmdSave_Click()
+    On Error GoTo HandleErrors
     Dim Invoice As New InvoiceEntity
     Dim Item As ItemEntity
     Dim Row As Integer
 
-    If Not ValidData Then Exit Sub
+    If Not FieldsValid Then Exit Sub
     
     Invoice.EmissionDate = DateValue(txtEmissionDate)
     Invoice.EmissionTime = Time
-    Invoice.TypeCurrency = IIf(cboTypeCurrency = "Soles", "PEN", "USD")
+    If cboTypeCurrency = "Soles" Then Invoice.TypeCurrency = AppTypeCurrencyPEN
+    If cboTypeCurrency = "Dólares" Then Invoice.TypeCurrency = AppTypeCurrencyUSD
     
     With frmInvoice.lstItems
         For Row = 0 To .ListCount - 1
             Set Item = New ItemEntity
             Item.Code = "1000"
-            Item.Description = .List(Row, 0)
+            Item.Description = Trim(.List(Row, 0))
             Item.Quantity = .List(Row, 1)
             Item.UnitValue = TaxLess(.List(Row, 2), Prop.Rate.Igv)
             
             Invoice.AddItem Item
         Next Row
     End With
-    
+
     Debug.Print InvoiceToJson(Invoice)
 
     MsgBox "El documento electrónico se generó correctamente.", vbInformation, "Documento generado"
     Unload Me
+    Exit Sub
+    
+HandleErrors:
+    MsgBox Err.Description, vbCritical, "Debe ingresar los datos del cliente."
 End Sub
 
-Private Function ValidData() As Boolean
+Private Function FieldsValid() As Boolean
     If txtDocNumber = Empty Then
         MsgBox "Debe ingresar el número del comprobante.", vbInformation, "Número de documento"
         txtDocNumber.SetFocus
@@ -84,7 +88,7 @@ Private Function ValidData() As Boolean
         Exit Function
     End If
     
-    ValidData = True
+    FieldsValid = True
 End Function
 
 Private Sub cmdCancel_Click()

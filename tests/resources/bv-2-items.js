@@ -28,7 +28,7 @@ const invoice = {
       codProducto: "CD0001",
       codProductoSUNAT: "-",
       desItem: "Producto 1",
-      mtoValorUnitario: "50.0000000000",
+      mtoValorUnitario: "50.00000000",
       sumTotTributosItem: "18.00",
 
       codTriIGV: "1000",
@@ -48,7 +48,7 @@ const invoice = {
       codProducto: "CD0002",
       codProductoSUNAT: "-",
       desItem: "Producto 2",
-      mtoValorUnitario: "10.0000000000",
+      mtoValorUnitario: "10.00000000",
       sumTotTributosItem: "9.00",
 
       codTriIGV: "1000",
