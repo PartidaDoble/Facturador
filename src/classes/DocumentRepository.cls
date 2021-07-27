@@ -23,8 +23,8 @@ Public Sub Add(Document As DocumentEntity)
         .Cells(Row, 7) = "'" & Document.CustomerDocNumber
         .Cells(Row, 8) = Document.CustomerName
         .Cells(Row, 9) = IIf(Document.TypeCurrency = "PEN", "Soles", "Dólares")
-        .Cells(Row, 10) = Document.SubTotal
-        .Cells(Row, 11) = Document.Igv
+        .Cells(Row, 10) = Format(Document.SubTotal, "#,##0.00")
+        .Cells(Row, 11) = Format(Document.Igv, "#,##0.00")
         .Cells(Row, 12) = Document.Total
         .Cells(Row, 13) = GetSituationFromEnum(Document.Situation)
         .Cells(Row, 14) = Document.Observation

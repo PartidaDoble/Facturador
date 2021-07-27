@@ -145,3 +145,68 @@ Private Sub baja_de_dos_documentos()
         .AssertEquals Expected, CanceledDocumentsToJson(Docs, False)
     End With
 End Sub
+
+Private Sub ResumenDiarioBoletas_UnaBoleta()
+    Dim Expected As String
+    Dim Documents As New Collection
+    Dim Document As New DocumentEntity
+    
+    Document.Emission = DateValue("25/07/2021")
+    Document.DocType = "03"
+    Document.DocSerie = "B001"
+    Document.DocNumber = 1
+    Document.CustomerDocType = "1"
+    Document.CustomerDocNumber = "00000000"
+    Document.TypeCurrency = "PEN"
+    Document.SubTotal = 100
+    Document.Igv = 18
+    Document.Total = 118
+
+    Documents.Add Document
+    
+    Expected = "{""resumenDiario"":[{""fecEmision"":""2021-07-25"",""fecResumen"":""2021-07-26"",""tipDocResumen"":""03"",""idDocResumen"":""B001-00000001"",""tipDocUsuario"":""1"",""numDocUsuario"":""00000000"",""tipMoneda"":""PEN"",""totValGrabado"":""100.00"",""totValExoneado"":""0.00"",""totValInafecto"":""0.00"",""totValExportado"":""0.00"",""totValGratuito"":""0.00"",""totOtroCargo"":""0.00"",""totImpCpe"":""118.00"",""tipEstado"":""1"",""tributosDocResumen"":[{""idLineaRd"":""1"",""ideTributoRd"":""1000"",""nomTributoRd"":""IGV"",""codTipTributoRd"":""VAT"",""mtoBaseImponibleRd"":""100.00"",""mtoTributoRd"":""18.00""}]}]}"
+    
+    With Test.It("Con estado 1 (adicionar)")
+        .AssertEquals Expected, DailySummaryToJson(Documents, DateValue("26/07/2021"), "1", False)
+    End With
+End Sub
+
+Private Sub ResumenDiarioBoletas_DosBoleta()
+    Dim Expected As String
+    Dim Documents As New Collection
+    Dim Document1 As New DocumentEntity
+    Dim Document2 As New DocumentEntity
+    
+    Document1.Emission = DateValue("25/07/2021")
+    Document1.DocType = "03"
+    Document1.DocSerie = "B001"
+    Document1.DocNumber = 1
+    Document1.CustomerDocType = "1"
+    Document1.CustomerDocNumber = "00000000"
+    Document1.TypeCurrency = "PEN"
+    Document1.SubTotal = 100
+    Document1.Igv = 18
+    Document1.Total = 118
+
+    Documents.Add Document1
+    
+    Document2.Emission = DateValue("25/07/2021")
+    Document2.DocType = "03"
+    Document2.DocSerie = "B001"
+    Document2.DocNumber = 2
+    Document2.CustomerDocType = "1"
+    Document2.CustomerDocNumber = "00000000"
+    Document2.TypeCurrency = "PEN"
+    Document2.SubTotal = 200
+    Document2.Igv = 36
+    Document2.Total = 236
+
+    Documents.Add Document2
+    
+    Expected = "{""resumenDiario"":[{""fecEmision"":""2021-07-25"",""fecResumen"":""2021-07-26"",""tipDocResumen"":""03"",""idDocResumen"":""B001-00000001"",""tipDocUsuario"":""1"",""numDocUsuario"":""00000000"",""tipMoneda"":""PEN"",""totValGrabado"":""100.00"",""totValExoneado"":""0.00"",""totValInafecto"":""0.00"",""totValExportado"":""0.00"",""totValGratuito"":""0.00"",""totOtroCargo"":""0.00"",""totImpCpe"":""118.00"",""tipEstado"":""1"",""tributosDocResumen"":[{""idLineaRd"":""1"",""ideTributoRd"":""1000"",""nomTributoRd"":""IGV"",""codTipTributoRd"":""VAT"",""mtoBaseImponibleRd"":""100.00"",""mtoTributoRd"":""18.00""}]},"
+    Expected = Expected & "{""fecEmision"":""2021-07-25"",""fecResumen"":""2021-07-26"",""tipDocResumen"":""03"",""idDocResumen"":""B001-00000002"",""tipDocUsuario"":""1"",""numDocUsuario"":""00000000"",""tipMoneda"":""PEN"",""totValGrabado"":""200.00"",""totValExoneado"":""0.00"",""totValInafecto"":""0.00"",""totValExportado"":""0.00"",""totValGratuito"":""0.00"",""totOtroCargo"":""0.00"",""totImpCpe"":""236.00"",""tipEstado"":""1"",""tributosDocResumen"":[{""idLineaRd"":""2"",""ideTributoRd"":""1000"",""nomTributoRd"":""IGV"",""codTipTributoRd"":""VAT"",""mtoBaseImponibleRd"":""200.00"",""mtoTributoRd"":""36.00""}]}]}"
+    
+    With Test.It("Con estado 1 (adicionar)")
+        .AssertEquals Expected, DailySummaryToJson(Documents, DateValue("26/07/2021"), "1", False)
+    End With
+End Sub

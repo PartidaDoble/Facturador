@@ -1,11 +1,64 @@
 Attribute VB_Name = "Core"
 Option Explicit
 
+Public Function DailySummaryToJson(Documents As Collection, SummaryDate As Date, State As String, Optional Pretty As Boolean = True) As String
+    Dim Data As New Dictionary
+    Dim ResumenDiario As New Collection
+    Dim SummaryDocument As Dictionary
+    Dim TributosDocResumen As Collection
+    Dim Tributos As Dictionary
+    Dim Document As Object
+    Dim DocumentCounter As Integer
+    
+    For Each Document In Documents
+        Set SummaryDocument = New Dictionary
+        SummaryDocument.Add "fecEmision", Format(Document.Emission, "yyyy-mm-dd")
+        SummaryDocument.Add "fecResumen", Format(SummaryDate, "yyyy-mm-dd")
+        SummaryDocument.Add "tipDocResumen", Document.DocType
+        SummaryDocument.Add "idDocResumen", Document.DocSerie & "-" & Format(Document.DocNumber, "00000000")
+        SummaryDocument.Add "tipDocUsuario", Document.CustomerDocType
+        SummaryDocument.Add "numDocUsuario", Document.CustomerDocNumber
+        SummaryDocument.Add "tipMoneda", Document.TypeCurrency
+        SummaryDocument.Add "totValGrabado", Format(Document.SubTotal, "0.00")
+        SummaryDocument.Add "totValExoneado", "0.00"
+        SummaryDocument.Add "totValInafecto", "0.00"
+        SummaryDocument.Add "totValExportado", "0.00"
+        SummaryDocument.Add "totValGratuito", "0.00"
+        SummaryDocument.Add "totOtroCargo", "0.00"
+        SummaryDocument.Add "totImpCpe", Format(Document.Total, "0.00")
+        SummaryDocument.Add "tipEstado", State
+        
+        DocumentCounter = DocumentCounter + 1
+        Set Tributos = New Dictionary
+        Tributos.Add "idLineaRd", CStr(DocumentCounter)
+        Tributos.Add "ideTributoRd", "1000"
+        Tributos.Add "nomTributoRd", "IGV"
+        Tributos.Add "codTipTributoRd", "VAT"
+        Tributos.Add "mtoBaseImponibleRd", Format(Document.SubTotal, "0.00")
+        Tributos.Add "mtoTributoRd", Format(Document.Igv, "0.00")
+        
+        Set TributosDocResumen = New Collection
+        TributosDocResumen.Add Tributos
+        
+        SummaryDocument.Add "tributosDocResumen", TributosDocResumen
+        
+        ResumenDiario.Add SummaryDocument
+    Next Document
+    
+    Data.Add "resumenDiario", ResumenDiario
+    
+    If Pretty Then
+        DailySummaryToJson = ConvertToJson(Data, 2)
+    Else
+        DailySummaryToJson = ConvertToJson(Data)
+    End If
+End Function
+
 Public Sub CheckTicketStatus()
+    Dim CanceledDocumentRepo As New CanceledDocumentRepository
     Dim CanceledDocument As Object
     Dim FileName As String
     Dim Situation As String
-    Dim CanceledDocumentRepo As New CanceledDocumentRepository
     
     For Each CanceledDocument In CanceledDocumentRepo.GetAll
         If CanceledDocument.Situation = CdpEnviadoPorProcesar Then
@@ -136,7 +189,7 @@ Public Function InvoiceToJson(Invoice As InvoiceEntity, Optional Pretty As Boole
     Dim Leyendas As New Collection
     Dim Leyenda As New Dictionary
     Dim Igv As New Dictionary
-    Dim Item As Variant
+    Dim Item As Object
 
     Cabecera.Add "tipOperacion", "0101"
     Cabecera.Add "fecEmision", Format(Invoice.EmissionDate, "yyyy-mm-dd")
