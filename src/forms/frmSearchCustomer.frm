@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmSearchCustomer 
-   Caption         =   "AGREGAR CLIENTE"
+   Caption         =   "BUSCAR CLIENTE"
    ClientHeight    =   3885
    ClientLeft      =   120
    ClientTop       =   465
@@ -19,8 +19,12 @@ Private Sub cmdShowFormNewCustomer_Click()
     frmNewCustomer.Show
 End Sub
 
+Private Sub txtSearchCustomer_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger)
+    KeyAscii = ToUppercase(KeyAscii)
+End Sub
+
 Private Sub cmdSearch_Click()
-    Dim CustomerRepository As New CustomerRepositoryClass
+    Dim CustomerRepo As New CustomerRepository
     Dim Customer As Variant
     Dim p As Long
 
@@ -28,7 +32,7 @@ Private Sub cmdSearch_Click()
 
     lstCustomers.Clear
 
-    For Each Customer In CustomerRepository.GetAll
+    For Each Customer In CustomerRepo.GetAll
         If InStr(UCase(Customer.Name), UCase(Trim(txtSearchCustomer))) <> 0 Or InStr(UCase(Customer.DocNumber), UCase(Trim(txtSearchCustomer))) <> 0 Then
             With lstCustomers
                 p = .ListCount
@@ -47,6 +51,11 @@ End Sub
 
 Private Sub cmdAdd_Click()
     If lstCustomers.ListCount < 1 Then Exit Sub
+    
+    If lstCustomers.ListIndex < 0 Then
+        MsgBox "Debe seleccionar a un cliente.", vbExclamation, "Subsane la observación"
+        Exit Sub
+    End If
     
     With lstCustomers
         frmInvoice.txtCustomerDocNumber = Trim(.List(.ListIndex, 0))

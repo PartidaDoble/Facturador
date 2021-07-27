@@ -1,43 +1,56 @@
 Attribute VB_Name = "Common"
 Option Explicit
 
+Public Type AppType
+    Env As String
+    Debug As Boolean
+    Internet As Boolean
+    AutoProdCode As Boolean
+End Type
+
 Public Type RateType
     Igv As Double
 End Type
 
-Public Enum AppTypeCurrency
-    AppTypeCurrencyPEN
-    AppTypeCurrencyUSD
+Public Type CompanyType
+    Ruc As String
+    Name As String
+    LocalCodeEmission As String
+End Type
+
+Public Type SfsType
+    Port As String
+    Path As String
+    DATAPath As String
+    ENVIOPath As String
+    RPTAPath As String
+    REPOPath As String
+End Type
+
+Public Enum SituationEnum
+    CdpPorGenerarXml
+    CdpXmlGenerado
+    CdpEnviadoAceptado
+    CdpEnviadoAceptadoConObs
+    CdpRechazado
+    CdpConErrores
+    CdpPorValidarXml
+    CdpEnviadoPorProcesar
+    CdpEnviadoProcesando
+    CdpRechazado10
+    CdpEnviadoAceptado11
+    CdpEnviadoAceptadoConObs12
 End Enum
 
-Public Enum AppError
-    AppErrorBVMayor700Soles = 65400
-End Enum
-
-Public Enum AppDocType
-    AppDocTypeBoletaVenta
-    AppDocTypeFactura
-End Enum
-
-Public Enum AppTypeDocIdenty
-    AppTypeDocIdentyDNI
-    AppTypeDocIdentyRUC
-End Enum
-
-Public Function Prop() As AppProperties
-    Dim Properties As New AppProperties
-    Set Prop = Properties
+Public Function Prop() As Properties
+    Dim PropertiesInstance As New Properties
+    Set Prop = PropertiesInstance
 End Function
 
-Public Function Test() As VBAUnit
-    Dim UnitTest As New VBAUnit
-    Set Test = UnitTest
+Public Function DB() As Database
+    Dim DatabaseInstance As New Database
+    DatabaseInstance.ConnectionString = "DRIVER=SQLite3 ODBC Driver;Database=D:\sfs\SFS_v1.3.4.4\bd\BDFacturador.db;"
+    DatabaseInstance.DebugMode = False
+    'DatabaseInstance.AutomaticCreationAndUpdateTimestamp = false
+    Set DB = DatabaseInstance
 End Function
-
-Sub Fun()
-    Dim i As Integer
-    
-    For i = 1 To 100
-        Debug.Print i
-    Next
-End Sub

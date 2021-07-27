@@ -5,10 +5,6 @@ Public Function ToUppercase(InputKey) As Variant
     ToUppercase = Asc(UCase(Chr(InputKey)))
 End Function
 
-Public Function OnlyAlphanumeric(KeyAscii)
-    OnlyAlphanumeric = IIf(IsAlphanumeric(KeyAscii), Asc(UCase(Chr(KeyAscii))), 0)
-End Function
-
 Public Function OnlyAmount(KeyAscci)
     Dim Keys As String
     Keys = "1234567890." & Chr(vbKeyBack)
@@ -17,15 +13,12 @@ End Function
 
 Function OnlyInteger(InputKey) As Variant
     Dim Keys As String
-    
     Keys = "1234567890" & Chr(vbKeyBack)
-    
-    
-    If InStr(Keys, Chr(InputKey)) = 0 Then
-        OnlyInteger = 0
-    Else
-        OnlyInteger = InputKey
-    End If
+    OnlyInteger = IIf(InStr(Keys, Chr(InputKey)) = 0, 0, InputKey)
+End Function
+
+Public Function OnlyAlphanumeric(KeyAscii)
+    OnlyAlphanumeric = IIf(IsAlphanumeric(KeyAscii), Asc(UCase(Chr(KeyAscii))), 0)
 End Function
 
 Private Function IsAlphanumeric(KeyAscii As Variant) As Boolean
@@ -40,8 +33,8 @@ Private Function IsAlphanumeric(KeyAscii As Variant) As Boolean
     IsAlphanumeric = KeyIsNumber Or KeyIsLowercase Or KeyIsUppercase
 End Function
 
-Public Sub FrmInvoiceShowInformation()
-    Dim TypeCurrency As AppTypeCurrency
+Public Sub FrmInvoiceCalculateTotals()
+    Dim TypeCurrency As String
     Dim TotalPrice As Double
     Dim SubTotal As Double
     Dim Igv As Double
@@ -54,8 +47,7 @@ Public Sub FrmInvoiceShowInformation()
     frmInvoice.lblIGV = Format(Igv, "#,##0.00")
     frmInvoice.lblTotal = Format(TotalPrice, "#,##0.00")
 
-    If frmInvoice.cboTypeCurrency = "Soles" Then TypeCurrency = AppTypeCurrencyPEN
-    If frmInvoice.cboTypeCurrency = "Dólares" Then TypeCurrency = AppTypeCurrencyUSD
+    TypeCurrency = IIf(frmInvoice.cboTypeCurrency = "Soles", "PEN", "USD")
     frmInvoice.lblTotalInLetters.Caption = "SON: " & AmountInLetters(TotalPrice, TypeCurrency)
 End Sub
 
@@ -74,4 +66,24 @@ Public Function FrmInvoiceSumTotalItems() As Double
     End With
 
     FrmInvoiceSumTotalItems = Sum
+End Function
+
+Public Function GetCustomerName(Ruc As String) As String
+    On Error GoTo HandleErrors
+    Dim Doc As New Scraping
+    Dim Response As String
+    
+    Doc.gotoPage "https://e-consultaruc.sunat.gob.pe/cl-ti-itmrconsruc/FrameCriterioBusquedaWeb.jsp"
+    Doc.Id("txtRuc").FieldValue Ruc
+    Doc.Id("btnAceptar").click sleep:=3
+
+    If Trim(Doc.css(".list-group .col-sm-5").Index(0).text) = "Número de RUC:" Then
+        Response = Trim(Doc.css(".list-group .col-sm-7").Index(0).text)
+    End If
+    
+    GetCustomerName = Trim(Mid(Response, InStr(Response, "-") + 1))
+    DebugLog "Se obtiene el nombre del cliente desde la página web de la SUNAT | RUC: " & Ruc
+    Exit Function
+HandleErrors:
+    WarnLog "Hubo problemas al obtener la información desde la página web de la SUNAT | RUC: " & Ruc, "GetCustomerName"
 End Function

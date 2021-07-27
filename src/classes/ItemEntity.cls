@@ -9,9 +9,9 @@ Attribute VB_PredeclaredId = False
 Attribute VB_Exposed = False
 Option Explicit
 
-Public Code As String
+Public ProductCode As String
 
-Public UnitMeasurement As String
+Public UnitMeasure As String
 
 Public Description As String
 

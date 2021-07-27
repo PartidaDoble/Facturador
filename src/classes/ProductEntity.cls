@@ -11,7 +11,7 @@ Option Explicit
 
 Public Code As String
 
-Public UnitMeasurement As String
+Public UnitMeasure As String
 
 Public Description As String
 

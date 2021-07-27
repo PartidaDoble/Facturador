@@ -15,9 +15,13 @@ Public EmissionTime As Date
 
 Public DueDate As Date
 
-Public TypeCurrency As AppTypeCurrency
+Public TypeCurrency As String
 
-Public DocType As AppDocType
+Public DocType As String
+
+Public DocSerie As String
+
+Public DocNumber As Long
 
 Public Customer As New CustomerEntity
 

@@ -1,4 +1,4 @@
-Attribute VB_Name = "JsonConverter"
+Attribute VB_Name = "LibJsonConverter"
 ''
 ' VBA-JSON v2.3.1
 ' (c) Tim Hall - https://github.com/VBA-tools/VBA-JSON
@@ -482,9 +482,9 @@ Private Function json_ParseObject(json_String As String, ByRef json_Index As Lon
             json_Key = json_ParseKey(json_String, json_Index)
             json_NextChar = json_Peek(json_String, json_Index)
             If json_NextChar = "[" Or json_NextChar = "{" Then
-                Set json_ParseObject.item(json_Key) = json_ParseValue(json_String, json_Index)
+                Set json_ParseObject.Item(json_Key) = json_ParseValue(json_String, json_Index)
             Else
-                json_ParseObject.item(json_Key) = json_ParseValue(json_String, json_Index)
+                json_ParseObject.Item(json_Key) = json_ParseValue(json_String, json_Index)
             End If
         Loop
     End If
@@ -1121,6 +1121,3 @@ Private Function utc_SystemTimeToDate(utc_Value As utc_SYSTEMTIME) As Date
 End Function
 
 #End If
-
-
-

@@ -1,8 +1,14 @@
-Attribute VB_Name = "UseCasesTests"
+Attribute VB_Name = "CoreTests"
 Option Explicit
+
+Public Function Test() As VBAUnit
+    Dim UnitTest As New VBAUnit
+    Set Test = UnitTest
+End Function
 
 Private Sub RunAllModuleTests()
     generar_archivo_json_de_boleta_de_venta_con_un_item
+    generar_archivo_json_de_cuando_el_cp_esta_en_dolares
     generar_archivo_json_de_boleta_de_venta_con_dos_items
 End Sub
 
@@ -15,14 +21,16 @@ Private Sub generar_archivo_json_de_boleta_de_venta_con_un_item()
     Dim Invoice As New InvoiceEntity
     Dim Item As New ItemEntity
 
+    Item.ProductCode = "CD0001"
+    Item.UnitMeasure = "NIU"
+    Item.Description = "Producto 1"
     Item.Quantity = 2
     Item.UnitValue = 50
-    Item.Code = "CD0001"
-    Item.Description = "Producto 1"
 
     Invoice.EmissionDate = DateValue("30/06/2021")
     Invoice.EmissionTime = TimeValue("10:20:14")
-    Invoice.TypeCurrency = AppTypeCurrencyPEN
+    Invoice.TypeCurrency = "PEN"
+    Invoice.Customer.DocType = "1"
     
     Invoice.AddItem Item
 
@@ -46,21 +54,23 @@ Private Sub generar_archivo_json_de_cuando_el_cp_esta_en_dolares()
     Dim Invoice As New InvoiceEntity
     Dim Item As New ItemEntity
 
+    Item.ProductCode = "CD0001"
+    Item.UnitMeasure = "NIU"
+    Item.Description = "Producto 1"
     Item.Quantity = 2
     Item.UnitValue = 50
-    Item.Code = "CD0001"
-    Item.Description = "Producto 1"
 
     Invoice.EmissionDate = DateValue("30/06/2021")
     Invoice.EmissionTime = TimeValue("10:20:14")
-    Invoice.TypeCurrency = AppTypeCurrencyUSD
+    Invoice.TypeCurrency = "USD"
+    Invoice.Customer.DocType = "1"
     
     Invoice.AddItem Item
 
     Cabecera = """cabecera"":{""tipOperacion"":""0101"",""fecEmision"":""2021-06-30"",""horEmision"":""10:20:14"",""fecVencimiento"":""-"",""codLocalEmisor"":""0000"",""tipDocUsuario"":""1"",""numDocUsuario"":""00000000"",""rznSocialUsuario"":""varios"",""tipMoneda"":""USD"",""sumTotTributos"":""18.00"",""sumTotValVenta"":""100.00"",""sumPrecioVenta"":""118.00"",""sumDescTotal"":""0.00"",""sumOtrosCargos"":""0.00"",""sumTotalAnticipos"":""0.00"",""sumImpVenta"":""118.00"",""ublVersionId"":""2.1"",""customizationId"":""2.0""}"
     Detalle = """detalle"":[{""codUnidadMedida"":""NIU"",""ctdUnidadItem"":""2.00"",""codProducto"":""CD0001"",""codProductoSUNAT"":""-"",""desItem"":""Producto 1"",""mtoValorUnitario"":""50.00000000"",""sumTotTributosItem"":""18.00"",""codTriIGV"":""1000"",""mtoIgvItem"":""18.00"",""mtoBaseIgvItem"":""100.00"",""nomTributoIgvItem"":""IGV"",""codTipTributoIgvItem"":""VAT"",""tipAfeIGV"":""10"",""porIgvItem"":""18.00"",""mtoPrecioVentaUnitario"":""59.00"",""mtoValorVentaItem"":""100.00""}]"
     Tributos = """tributos"":[{""ideTributo"":""1000"",""nomTributo"":""IGV"",""codTipTributo"":""VAT"",""mtoBaseImponible"":""100.00"",""mtoTributo"":""18.00""}]"
-    Leyendas = """leyendas"":[{""codLeyenda"":""1000"",""desLeyenda"":""CIENTO DIECIOCHO CON 00/100 DOLARES AMERICANOS""}]"
+    Leyendas = """leyendas"":[{""codLeyenda"":""1000"",""desLeyenda"":""CIENTO DIECIOCHO CON 00/100 D\u00D3LARES AMERICANOS""}]"
     Expected = "{" & Cabecera & "," & Detalle & "," & Tributos & "," & Leyendas & "}"
 
     With Test.It("BV con un item")
@@ -78,22 +88,25 @@ Private Sub generar_archivo_json_de_boleta_de_venta_con_dos_items()
     Dim Item As ItemEntity
 
     Set Item = New ItemEntity
+    Item.ProductCode = "CD0001"
+    Item.UnitMeasure = "NIU"
+    Item.Description = "Producto 1"
     Item.Quantity = 2
     Item.UnitValue = 50
-    Item.Code = "CD0001"
-    Item.Description = "Producto 1"
     Invoice.AddItem Item
 
     Set Item = New ItemEntity
+    Item.ProductCode = "CD0002"
+    Item.UnitMeasure = "NIU"
+    Item.Description = "Producto 2"
     Item.Quantity = 5
     Item.UnitValue = 10
-    Item.Code = "CD0002"
-    Item.Description = "Producto 2"
     Invoice.AddItem Item
 
     Invoice.EmissionDate = DateValue("30/06/2021")
     Invoice.EmissionTime = TimeValue("10:20:14")
-    Invoice.TypeCurrency = AppTypeCurrencyPEN
+    Invoice.TypeCurrency = "PEN"
+    Invoice.Customer.DocType = "1"
 
     Cabecera = """cabecera"":{""tipOperacion"":""0101"",""fecEmision"":""2021-06-30"",""horEmision"":""10:20:14"",""fecVencimiento"":""-"",""codLocalEmisor"":""0000"",""tipDocUsuario"":""1"",""numDocUsuario"":""00000000"",""rznSocialUsuario"":""varios"",""tipMoneda"":""PEN"",""sumTotTributos"":""27.00"",""sumTotValVenta"":""150.00"",""sumPrecioVenta"":""177.00"",""sumDescTotal"":""0.00"",""sumOtrosCargos"":""0.00"",""sumTotalAnticipos"":""0.00"",""sumImpVenta"":""177.00"",""ublVersionId"":""2.1"",""customizationId"":""2.0""}"
     Detalle = """detalle"":[{""codUnidadMedida"":""NIU"",""ctdUnidadItem"":""2.00"",""codProducto"":""CD0001"",""codProductoSUNAT"":""-"",""desItem"":""Producto 1"",""mtoValorUnitario"":""50.00000000"",""sumTotTributosItem"":""18.00"",""codTriIGV"":""1000"",""mtoIgvItem"":""18.00"",""mtoBaseIgvItem"":""100.00"",""nomTributoIgvItem"":""IGV"",""codTipTributoIgvItem"":""VAT"",""tipAfeIGV"":""10"",""porIgvItem"":""18.00"",""mtoPrecioVentaUnitario"":""59.00"",""mtoValorVentaItem"":""100.00""},{""codUnidadMedida"":""NIU"",""ctdUnidadItem"":""5.00"",""codProducto"":""CD0002"",""codProductoSUNAT"":""-"",""desItem"":""Producto 2"",""mtoValorUnitario"":""10.00000000"",""sumTotTributosItem"":""9.00"",""codTriIGV"":""1000"",""mtoIgvItem"":""9.00"",""mtoBaseIgvItem"":""50.00"",""nomTributoIgvItem"":""IGV"",""codTipTributoIgvItem"":""VAT"",""tipAfeIGV"":""10"",""porIgvItem"":""18.00"",""mtoPrecioVentaUnitario"":""11.80"",""mtoValorVentaItem"":""50.00""}]"
@@ -103,5 +116,32 @@ Private Sub generar_archivo_json_de_boleta_de_venta_con_dos_items()
 
     With Test.It("BV con dos items")
         .AssertEquals Expected, InvoiceToJson(Invoice, False)
+    End With
+End Sub
+
+Private Sub baja_de_dos_documentos()
+    Dim Doc As New CanceledDocumentEntity
+    Dim Doc1 As New CanceledDocumentEntity
+    Dim Docs As New Collection
+    Dim Expected As String
+    
+    Doc.GenerationDate = DateValue("18/07/2021")
+    Doc.CommunicationDate = DateValue("18/07/2021")
+    Doc.DocType = "01"
+    Doc.DocNumber = "F001-00000007"
+    Doc.Motivo = "ERROR EN EL NOMBRE DEL CLIENTE"
+    Docs.Add Doc
+    
+    Doc1.GenerationDate = DateValue("18/07/2021")
+    Doc1.CommunicationDate = DateValue("18/07/2021")
+    Doc1.DocType = "01"
+    Doc1.DocNumber = "F001-00000008"
+    Doc1.Motivo = "ERROR EN EL NUMERO DE RUC"
+    Docs.Add Doc1
+    
+    Expected = "{""resumenBajas"":[{""fecGeneracion"":""2021-07-18"",""fecComunicacion"":""2021-07-18"",""tipDocBaja"":""01"",""numDocBaja"":""F001-00000007"",""desMotivoBaja"":""ERROR EN EL NOMBRE DEL CLIENTE""},{""fecGeneracion"":""2021-07-18"",""fecComunicacion"":""2021-07-18"",""tipDocBaja"":""01"",""numDocBaja"":""F001-00000008"",""desMotivoBaja"":""ERROR EN EL NUMERO DE RUC""}]}"
+    
+    With Test.It("baja de dos facturas")
+        .AssertEquals Expected, CanceledDocumentsToJson(Docs, False)
     End With
 End Sub

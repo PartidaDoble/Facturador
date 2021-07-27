@@ -1,16 +1,19 @@
 const { quoteToDoubleQuote } = require("./utils");
 
-const invoice = {
+const notaCredito = {
   cabecera: {
     tipOperacion: "0101",
-    fecEmision: "2021-06-30",
-    horEmision: "10:20:14",
-    fecVencimiento: "-",
+    fecEmision: "2021-07-25",
+    horEmision: "13:01:30",
     codLocalEmisor: "0000",
-    tipDocUsuario: "1",
-    numDocUsuario: "00000000",
-    rznSocialUsuario: "varios",
+    tipDocUsuario: "6",
+    numDocUsuario: "20448177484",
+    rznSocialUsuario: "TEST SAC",
     tipMoneda: "PEN",
+    codMotivo: "07",
+    desMotivo: "DEVOLUCIÓN DE MERCADERIAS",
+    tipDocAfectado: "01",
+    numDocAfectado: "F001-00000001",
     sumTotTributos: "18.00",
     sumTotValVenta: "100.00",
     sumPrecioVenta: "118.00",
@@ -60,15 +63,15 @@ const invoice = {
   ]
 }
 
-console.log(JSON.stringify(invoice));
+console.log(JSON.stringify(notaCredito));
 
-const {cabecera, detalle, tributos, leyendas} = invoice;
-console.log();
-console.log(quoteToDoubleQuote(JSON.stringify({cabecera})));
-console.log();
-console.log(quoteToDoubleQuote(JSON.stringify({detalle})));
-console.log();
-console.log(quoteToDoubleQuote(JSON.stringify({tributos})));
-console.log();
-console.log(quoteToDoubleQuote(JSON.stringify({leyendas})));
+// const {cabecera, detalle, tributos, leyendas} = invoice;
+// console.log();
+//console.log(quoteToDoubleQuote(JSON.stringify({bajas})));
+// console.log();
+// console.log(quoteToDoubleQuote(JSON.stringify({detalle})));
+// console.log();
+// console.log(quoteToDoubleQuote(JSON.stringify({tributos})));
+// console.log();
+// console.log(quoteToDoubleQuote(JSON.stringify({leyendas})));
 
