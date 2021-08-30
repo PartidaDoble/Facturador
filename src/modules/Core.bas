@@ -1,14 +1,203 @@
 Attribute VB_Name = "Core"
 Option Explicit
 
-Public Function DailySummaryToJson(Documents As Collection, SummaryDate As Date, State As String, Optional Pretty As Boolean = True) As String
+Public Sub GenerateElectronicDocument(DocType As String, DocNumber As String)
+    Dim Body As New Dictionary
+    Dim EndPoint As String
+    
+    Body.Add "num_ruc", Prop.Company.Ruc
+    Body.Add "tip_docu", DocType
+    Body.Add "num_docu", DocNumber
+    EndPoint = "http://localhost:" & Prop.Sfs.Port & "/api/GenerarComprobante.htm"
+    
+    If Post(EndPoint, ConvertToJson(Body)) Then
+        DebugLog "El comprobante electrónico " & DocNumber & " se generó correctamente.", "GenerateElectronicDocument"
+    Else
+        ErrorLog "Error al generar el documento electrónico " & DocNumber, "GenerateElectronicDocument"
+    End If
+End Sub
+
+Public Sub SendElectronicDocument(DocType As String, DocNumber As String)
+    Dim Body As New Dictionary
+    Dim EndPoint As String
+
+    Body.Add "num_ruc", Prop.Company.Ruc
+    Body.Add "tip_docu", DocType
+    Body.Add "num_docu", DocNumber
+    EndPoint = "http://localhost:" & Prop.Sfs.Port & "/api/enviarXML.htm"
+    
+    If Not Post(EndPoint, ConvertToJson(Body)) Then
+        ErrorLog "Error al enviar el documento electrónico " & DocNumber & " a la SUNAT.", "SendElectronicDocument"
+    End If
+End Sub
+
+Public Sub CreateInvoiceJsonFile(Invoice As DocumentEntity)
+    On Error GoTo HandleErrors
+    Dim JsonFileName As String
+
+    JsonFileName = Prop.Company.Ruc & "-" & Invoice.Id & ".json"
+    WriteFile PathJoin(Prop.Sfs.DATAPath, JsonFileName), DocumentToJson(Invoice)
+    DebugLog "El archivo JSON " & JsonFileName & " fue creado correctamente.", "CreateInvoiceJsonFile"
+    Exit Sub
+HandleErrors:
+    ErrorLog "Error al crear el archivo JSON " & JsonFileName, "CreateInvoiceJsonFile", Err.Number
+End Sub
+
+Public Sub CreateNoteJsonFile(Note As DocumentEntity)
+    On Error GoTo HandleErrors
+    Dim JsonFileName As String
+
+    JsonFileName = Prop.Company.Ruc & "-" & Note.Id & ".json"
+    WriteFile PathJoin(Prop.Sfs.DATAPath, JsonFileName), DocumentToJson(Note)
+    DebugLog "El archivo JSON " & JsonFileName & " fue creado correctamente.", "CreateNoteJsonFile"
+    Exit Sub
+HandleErrors:
+    ErrorLog "Error al crear el archivo JSON " & JsonFileName, "CreateNoteJsonFile", Err.Number
+End Sub
+
+Public Sub CreateDailySummaryJsonFile(JsonFileName As String, Documents As Collection, SummaryDate As Date)
+    On Error GoTo HandleErrors
+    WriteFile PathJoin(Prop.Sfs.DATAPath, JsonFileName), DailySummaryToJson(Documents, SummaryDate)
+    DebugLog "El archivo JSON " & JsonFileName & " de resumen diario de boletas fue creado correctamente.", "CreateDailySummaryJsonFile"
+    Exit Sub
+HandleErrors:
+    ErrorLog "Error al crear el archivo JSON " & JsonFileName & " de resumen diario de boletas.", "CreateDailySummaryJsonFile", Err.Number
+End Sub
+
+Public Sub CreateCanceledDocumentJsonFile(JsonFileName As String, Documents As Collection)
+    On Error GoTo HandleErrors
+    WriteFile PathJoin(Prop.Sfs.DATAPath, JsonFileName), CanceledDocumentsToJson(Documents)
+    DebugLog "El archivo JSON " & JsonFileName & " para anular comprobantes fue creado correctamente.", "CreateCanceledDocumentJsonFile"
+    Exit Sub
+HandleErrors:
+    ErrorLog "Error al crear el archivo JSON " & JsonFileName & " para anular comprobantes.", "CreateCanceledDocumentJsonFile", Err.Number
+End Sub
+
+Public Function DocumentToJson(Document As DocumentEntity, Optional Pretty As Boolean = True) As String
+    Dim Item As ItemEntity
+    Dim Data As New Dictionary
+    Dim Cabecera As New Dictionary
+    Dim AdicionalCabecera As New Dictionary
+    Dim Detalle As New Collection
+    Dim DetalleItem As Dictionary
+    Dim Tributos As New Collection
+    Dim Leyendas As New Collection
+    Dim Leyenda As Dictionary
+    Dim Igv As New Dictionary
+    
+    Cabecera.Add "tipOperacion", Document.OperationCode
+    Cabecera.Add "fecEmision", Format(Document.Emission, "yyyy-mm-dd")
+    Cabecera.Add "horEmision", Format(Document.EmissionTime, "HH:mm:ss")
+    Cabecera.Add "codLocalEmisor", Prop.Company.LocalCodeEmission
+    
+    If Document.Customer Is Nothing Then
+        Cabecera.Add "tipDocUsuario", "1"
+        Cabecera.Add "numDocUsuario", "00000000"
+        Cabecera.Add "rznSocialUsuario", "VARIOS"
+    Else
+        Cabecera.Add "tipDocUsuario", Document.Customer.DocType
+        Cabecera.Add "numDocUsuario", Document.Customer.DocNumber
+        Cabecera.Add "rznSocialUsuario", Document.Customer.Name
+    End If
+    
+    Cabecera.Add "tipMoneda", Document.TypeCurrency
+    
+    If Not Document.NoteInfo Is Nothing Then
+        Cabecera.Add "codMotivo", Document.NoteInfo.MotiveCode
+        Cabecera.Add "desMotivo", Document.NoteInfo.Motive
+        Cabecera.Add "tipDocAfectado", Document.NoteInfo.RefDocType
+        Cabecera.Add "numDocAfectado", Document.NoteInfo.RefDocSerie & "-" & Format(Document.NoteInfo.RefDocNumber, "00000000")
+    End If
+    
+    Cabecera.Add "sumTotTributos", Format(Document.Igv, "0.00")
+    Cabecera.Add "sumTotValVenta", Format(Document.SubTotal, "0.00")
+    Cabecera.Add "sumPrecioVenta", Format(Document.Total, "0.00")
+    Cabecera.Add "sumDescTotal", "0.00"
+    Cabecera.Add "sumOtrosCargos", "0.00"
+    Cabecera.Add "sumTotalAnticipos", "0.00"
+    Cabecera.Add "sumImpVenta", Format(Document.Total, "0.00")
+    Cabecera.Add "ublVersionId", "2.1"
+    Cabecera.Add "customizationId", "2.0"
+    
+    If Not Document.Detraction Is Nothing Then
+        AdicionalCabecera.Add "ctaBancoNacionDetraccion", Prop.Company.NroCtaDetraction
+        AdicionalCabecera.Add "codBienDetraccion", Document.Detraction.Code
+        AdicionalCabecera.Add "porDetraccion", CStr(Document.Detraction.Percentage)
+        AdicionalCabecera.Add "mtoDetraccion", Format(Document.Detraction.amount, "0.00")
+        AdicionalCabecera.Add "codMedioPago", Document.Detraction.PaymentMethod
+        
+        Set Leyenda = New Dictionary
+        Leyenda.Add "codLeyenda", "2006"
+        Leyenda.Add "desLeyenda", "OPERACION SUJETA AL SPOT"
+        Leyendas.Add Leyenda
+    End If
+    
+    If Not Document.Customer Is Nothing Then
+        If Document.Customer.HasValidAddress Then
+            AdicionalCabecera.Add "codPaisCliente", "PE"
+            AdicionalCabecera.Add "codUbigeoCliente", Document.Customer.Ubigeo
+            AdicionalCabecera.Add "desDireccionCliente", Document.Customer.Address
+        End If
+    End If
+    
+    If AdicionalCabecera.Count > 0 Then
+        Cabecera.Add "adicionalCabecera", AdicionalCabecera
+    End If
+    
+    For Each Item In Document.Items
+        Set DetalleItem = New Dictionary
+        DetalleItem.Add "codUnidadMedida", Item.UnitMeasure
+        DetalleItem.Add "ctdUnidadItem", Format(Item.Quantity, "0.00")
+        DetalleItem.Add "codProducto", Item.ProductCode
+        DetalleItem.Add "codProductoSUNAT", "-"
+        DetalleItem.Add "desItem", Item.Description
+        DetalleItem.Add "mtoValorUnitario", Format(Item.UnitValue, "0.00000000")
+        DetalleItem.Add "sumTotTributosItem", Format(Item.Igv, "0.00")
+        DetalleItem.Add "codTriIGV", "1000"
+        DetalleItem.Add "mtoIgvItem", Format(Item.Igv, "0.00")
+        DetalleItem.Add "mtoBaseIgvItem", Format(Item.SaleValue, "0.00")
+        DetalleItem.Add "nomTributoIgvItem", "IGV"
+        DetalleItem.Add "codTipTributoIgvItem", "VAT"
+        DetalleItem.Add "tipAfeIGV", "10"
+        DetalleItem.Add "porIgvItem", "18.00"
+        DetalleItem.Add "mtoPrecioVentaUnitario", Format(Item.UnitValue + (Item.UnitValue * Prop.Rate.Igv), "0.00")
+        DetalleItem.Add "mtoValorVentaItem", Format(Item.Quantity * Item.UnitValue, "0.00")
+        Detalle.Add DetalleItem
+    Next Item
+    
+    Igv.Add "ideTributo", "1000"
+    Igv.Add "nomTributo", "IGV"
+    Igv.Add "codTipTributo", "VAT"
+    Igv.Add "mtoBaseImponible", Format(Document.SubTotal, "0.00")
+    Igv.Add "mtoTributo", Format(Document.Igv, "0.00")
+    Tributos.Add Igv
+    
+    Set Leyenda = New Dictionary
+    Leyenda.Add "codLeyenda", "1000"
+    Leyenda.Add "desLeyenda", AmountInLetters(Document.Total, Document.TypeCurrency)
+    Leyendas.Add Leyenda
+    
+    Data.Add "cabecera", Cabecera
+    Data.Add "detalle", Detalle
+    Data.Add "tributos", Tributos
+    Data.Add "leyendas", Leyendas
+    
+    If Pretty Then
+        DocumentToJson = ConvertToJson(Data, 2)
+    Else
+        DocumentToJson = ConvertToJson(Data)
+    End If
+End Function
+
+Public Function DailySummaryToJson(Documents As Collection, SummaryDate As Date, Optional Pretty As Boolean = True) As String
     Dim Data As New Dictionary
     Dim ResumenDiario As New Collection
     Dim SummaryDocument As Dictionary
     Dim TributosDocResumen As Collection
     Dim Tributos As Dictionary
-    Dim Document As Object
+    Dim Document As DocumentEntity
     Dim DocumentCounter As Integer
+    Dim State As String
     
     For Each Document In Documents
         Set SummaryDocument = New Dictionary
@@ -16,8 +205,15 @@ Public Function DailySummaryToJson(Documents As Collection, SummaryDate As Date,
         SummaryDocument.Add "fecResumen", Format(SummaryDate, "yyyy-mm-dd")
         SummaryDocument.Add "tipDocResumen", Document.DocType
         SummaryDocument.Add "idDocResumen", Document.DocSerie & "-" & Format(Document.DocNumber, "00000000")
-        SummaryDocument.Add "tipDocUsuario", Document.CustomerDocType
-        SummaryDocument.Add "numDocUsuario", Document.CustomerDocNumber
+        
+        If Document.Customer Is Nothing Then
+            SummaryDocument.Add "tipDocUsuario", "1"
+            SummaryDocument.Add "numDocUsuario", "00000000"
+        Else
+            SummaryDocument.Add "tipDocUsuario", Document.Customer.DocType
+            SummaryDocument.Add "numDocUsuario", Document.Customer.DocNumber
+        End If
+        
         SummaryDocument.Add "tipMoneda", Document.TypeCurrency
         SummaryDocument.Add "totValGrabado", Format(Document.SubTotal, "0.00")
         SummaryDocument.Add "totValExoneado", "0.00"
@@ -26,7 +222,15 @@ Public Function DailySummaryToJson(Documents As Collection, SummaryDate As Date,
         SummaryDocument.Add "totValGratuito", "0.00"
         SummaryDocument.Add "totOtroCargo", "0.00"
         SummaryDocument.Add "totImpCpe", Format(Document.Total, "0.00")
-        SummaryDocument.Add "tipEstado", State
+        SummaryDocument.Add "tipEstado", Document.GetState
+        
+        If Not Document.NoteInfo Is Nothing Then
+            If Document.IsBoletaNote Then
+                SummaryDocument.Add "tipDocModifico", Document.NoteInfo.RefDocType
+                SummaryDocument.Add "serDocModifico", Document.NoteInfo.RefDocSerie
+                SummaryDocument.Add "numDocModifico", Document.NoteInfo.RefDocNumber
+            End If
+        End If
         
         DocumentCounter = DocumentCounter + 1
         Set Tributos = New Dictionary
@@ -54,106 +258,25 @@ Public Function DailySummaryToJson(Documents As Collection, SummaryDate As Date,
     End If
 End Function
 
-Public Sub CheckTicketStatus()
-    Dim CanceledDocumentRepo As New CanceledDocumentRepository
-    Dim CanceledDocument As Object
-    Dim FileName As String
-    Dim Situation As String
-    
-    For Each CanceledDocument In CanceledDocumentRepo.GetAll
-        If CanceledDocument.Situation = CdpEnviadoPorProcesar Then
-            FileName = Prop.Company.Ruc & "-" & CanceledDocument.Id
-            Situation = GetDocumentSituation(FileName)
-            If Situation <> "08" Then
-                CanceledDocument.Situation = GetSituationFromCode(Situation)
-                CanceledDocument.Observation = GetDocumentObservation(FileName)
-                CanceledDocumentRepo.Update CanceledDocument
-            End If
-        End If
-    Next CanceledDocument
-End Sub
-
-Public Sub CancelDocument(DocumentNumber As String, Motivo As String, SendingDate As Date)
-    Dim DocumentRepo As New DocumentRepository
+Public Function CanceledDocumentsToJson(Documents As Collection, Optional Pretty As Boolean = True) As String
     Dim Document As DocumentEntity
-    Dim CanceledDocuments As New Collection
-    Dim CanceledDocument As CanceledDocumentEntity
-    Dim Correlative As Long
-    Dim CanceledDocumentNumber As String
-    Dim FileName As String
-    Dim CanceledDocumentRepo As New CanceledDocumentRepository
-
-    Set Document = DocumentRepo.GetItem(DocumentNumber)
-    If Not Document Is Nothing Then
-        If Document.Situation = CdpEnviadoAceptado Or Document.Situation = CdpEnviadoAceptadoConObs Then
-            Set CanceledDocument = CreateCanceledDocumentEntity(Document, Motivo, SendingDate)
-            CanceledDocuments.Add CanceledDocument
-            Correlative = WorksheetFunction.CountIf(sheetCanceledDocuments.Columns(3), SendingDate) + 1
-            
-            CanceledDocumentNumber = "RA-" & Format(SendingDate, "yyyymmdd") & "-" & Format(Correlative, "000")
-            CreateFileJsonCancelDocument CanceledDocuments, CanceledDocumentNumber
-            RefreshSfsScreen
-            GenerateElectronicDocument "RA", CanceledDocumentNumber
-            If ElectronicDocumentExists(CanceledDocumentNumber) Then
-                SendElectronicDocument "RA", CanceledDocumentNumber
-                
-                FileName = Prop.Company.Ruc & "-" & CanceledDocumentNumber
-                CanceledDocument.Correlative = Correlative
-                CanceledDocument.Situation = GetSituationFromCode(GetDocumentSituation(FileName))
-                CanceledDocument.Observation = GetDocumentObservation(FileName)
-                
-                CanceledDocumentRepo.Add CanceledDocument
-                MsgBox "La solicitud de anulación del comprobante " & DocumentNumber & " fue enviado a la SUNAT correctamente.", vbInformation, ""
-                InfoLog "La solicitud de anulación del comprobante " & DocumentNumber & " fue enviado a la SUNAT correctamente.", "CancelDocument"
-            Else
-                MsgBox "Error al generar el xml para anular el comprobante " & DocumentNumber, vbCritical, ""
-                ErrorLog "Error al generar el xml para anular el comprobante " & DocumentNumber, "CancelDocument"
-            End If
-        Else
-            MsgBox "Para anular el comprobante " & DocumentNumber & " debe tener la situación ""03 - enviado y aceptado sunat"" o ""04 - enviado y aceptado sunat con obs.""", vbExclamation, ""
-            WarnLog "Para anular el comprobante " & DocumentNumber & " debe tener la situación 03 o 04", "CancelDocument"
-        End If
-    Else
-        MsgBox "Para anular el comprobante " & DocumentNumber & " debe estar registrado en la hoja Comprobantes.", vbExclamation, ""
-        WarnLog "Para anular el comprobante " & DocumentNumber & " debe estar registrado en la hoja Comprobantes.", "CancelDocument"
-    End If
-End Sub
-
-Public Sub CreateFileJsonCancelDocument(Documents As Collection, DocumentNumber As String)
-    On Error GoTo HandleErrors
-    Dim fs As New FileSystemObject
-    Dim Stream As TextStream
-    Dim FileName As String
-    Dim DocumentPath As String
-
-    FileName = Prop.Company.Ruc & "-" & DocumentNumber & ".json"
-    DocumentPath = fs.BuildPath(Prop.Sfs.DATAPath, FileName)
-    Set Stream = fs.CreateTextFile(DocumentPath)
-    Stream.Write CanceledDocumentsToJson(Documents)
-    Stream.Close
-    DebugLog "El archivo JSON " & FileName & " para anular comprobantes fue creado correctamente.", "CreateFileJsonCancelDocument"
-    Exit Sub
-HandleErrors:
-    ErrorLog "Error al crear el archivo JSON " & FileName & " para anular comprobantes.", "CreateFileJsonCancelDocument", Err.Number
-End Sub
-
-Public Function CanceledDocumentsToJson(CanceledDocuments As Collection, Optional Pretty As Boolean = True) As String
     Dim Data As New Dictionary
-    Dim Document As Dictionary
-    Dim Documents As New Collection
-    Dim CanceledDocument As Variant
+    Dim CanceledDocument As Dictionary
+    Dim CanceledDocuments As New Collection
     
-    For Each CanceledDocument In CanceledDocuments
-        Set Document = New Dictionary
-        Document.Add "fecGeneracion", Format(CanceledDocument.GenerationDate, "yyyy-mm-dd")
-        Document.Add "fecComunicacion", Format(CanceledDocument.CommunicationDate, "yyyy-mm-dd")
-        Document.Add "tipDocBaja", CanceledDocument.DocType
-        Document.Add "numDocBaja", CanceledDocument.DocNumber
-        Document.Add "desMotivoBaja", CanceledDocument.Motivo
-        Documents.Add Document
-    Next CanceledDocument
+    For Each Document In Documents
+        Set CanceledDocument = New Dictionary
+        
+        CanceledDocument.Add "fecGeneracion", Format(Document.Emission, "yyyy-mm-dd")
+        CanceledDocument.Add "fecComunicacion", Format(Date, "yyyy-mm-dd")
+        CanceledDocument.Add "tipDocBaja", Document.DocType
+        CanceledDocument.Add "numDocBaja", Document.DocSerie & "-" & Format(Document.DocNumber, "00000000")
+        CanceledDocument.Add "desMotivoBaja", Split(Document.CancelInfo, "|")(1)
+        
+        CanceledDocuments.Add CanceledDocument
+    Next Document
     
-    Data.Add "resumenBajas", Documents
+    Data.Add "resumenBajas", CanceledDocuments
     
     If Pretty Then
         CanceledDocumentsToJson = ConvertToJson(Data, 2)
@@ -161,127 +284,3 @@ Public Function CanceledDocumentsToJson(CanceledDocuments As Collection, Optiona
         CanceledDocumentsToJson = ConvertToJson(Data)
     End If
 End Function
-
-Public Sub CreateInvoiceJsonFile(Invoice As InvoiceEntity)
-    On Error GoTo HandleErrors
-    Dim fs As New FileSystemObject
-    Dim Stream As TextStream
-    Dim InvoiceFileName As String
-    Dim InvoicePath As String
-
-    InvoiceFileName = CreateFileName(Invoice.DocType, Invoice.DocSerie, Invoice.DocNumber) & ".json"
-    InvoicePath = fs.BuildPath(Prop.Sfs.DATAPath, InvoiceFileName)
-    Set Stream = fs.CreateTextFile(InvoicePath)
-    Stream.Write InvoiceToJson(Invoice)
-    Stream.Close
-    DebugLog "El archivo JSON " & InvoiceFileName & " fue creado correctamente.", "CreateInvoiceJsonFile"
-    Exit Sub
-HandleErrors:
-    ErrorLog "Error al crear el archivo JSON " & InvoiceFileName, "CreateInvoiceJsonFile", Err.Number
-End Sub
-
-Public Function InvoiceToJson(Invoice As InvoiceEntity, Optional Pretty As Boolean = True) As String
-    Dim Data As New Dictionary
-    Dim Cabecera As New Dictionary
-    Dim Detalle As New Collection
-    Dim DetalleItem As Dictionary
-    Dim Tributos As New Collection
-    Dim Leyendas As New Collection
-    Dim Leyenda As New Dictionary
-    Dim Igv As New Dictionary
-    Dim Item As Object
-
-    Cabecera.Add "tipOperacion", "0101"
-    Cabecera.Add "fecEmision", Format(Invoice.EmissionDate, "yyyy-mm-dd")
-    Cabecera.Add "horEmision", Format(Invoice.EmissionTime, "HH:mm:ss")
-    Cabecera.Add "fecVencimiento", IIf(CInt(Invoice.DueDate) = 0, "-", Format(Invoice.DueDate, "yyyy-mm-dd"))
-    Cabecera.Add "codLocalEmisor", Prop.Company.LocalCodeEmission
-    Cabecera.Add "tipDocUsuario", Invoice.Customer.DocType
-    Cabecera.Add "numDocUsuario", IIf(Invoice.Customer.DocNumber = Empty, "00000000", Invoice.Customer.DocNumber)
-    Cabecera.Add "rznSocialUsuario", IIf(Invoice.Customer.Name = Empty, "varios", Invoice.Customer.Name)
-    Cabecera.Add "tipMoneda", Invoice.TypeCurrency
-    Cabecera.Add "sumTotTributos", Format(Invoice.Igv, "0.00")
-    Cabecera.Add "sumTotValVenta", Format(Invoice.SubTotal, "0.00")
-    Cabecera.Add "sumPrecioVenta", Format(Invoice.Total, "0.00")
-    Cabecera.Add "sumDescTotal", "0.00"
-    Cabecera.Add "sumOtrosCargos", "0.00"
-    Cabecera.Add "sumTotalAnticipos", "0.00"
-    Cabecera.Add "sumImpVenta", Format(Invoice.Total, "0.00")
-    Cabecera.Add "ublVersionId", "2.1"
-    Cabecera.Add "customizationId", "2.0"
-
-    For Each Item In Invoice.Items
-        Set DetalleItem = New Dictionary
-        DetalleItem.Add "codUnidadMedida", Item.UnitMeasure
-        DetalleItem.Add "ctdUnidadItem", Format(Item.Quantity, "0.00")
-        DetalleItem.Add "codProducto", Item.ProductCode
-        DetalleItem.Add "codProductoSUNAT", "-" ' catálogo 25
-        DetalleItem.Add "desItem", Item.Description
-        DetalleItem.Add "mtoValorUnitario", Format(Item.UnitValue, "0.00000000")
-        DetalleItem.Add "sumTotTributosItem", Format(Item.Igv, "0.00") ' IGV + ISC ____
-        DetalleItem.Add "codTriIGV", "1000" ' catálogo 5
-        DetalleItem.Add "mtoIgvItem", Format(Item.Igv, "0.00")
-        DetalleItem.Add "mtoBaseIgvItem", Format(Item.SaleValue, "0.00")
-        DetalleItem.Add "nomTributoIgvItem", "IGV" ' catálogo 5 name
-        DetalleItem.Add "codTipTributoIgvItem", "VAT" ' catálogo 5
-        DetalleItem.Add "tipAfeIGV", "10" ' catálogo 7
-        DetalleItem.Add "porIgvItem", "18.00" ' tasa IGV ___
-        DetalleItem.Add "mtoPrecioVentaUnitario", Format(Item.UnitValue + (Item.UnitValue * Prop.Rate.Igv), "0.00") ' mtoValorUnitario + mtoIgvUnitario
-        DetalleItem.Add "mtoValorVentaItem", Format(Item.Quantity * Item.UnitValue, "0.00") ' ctdUnidadItem * mtoValorUnitario
-        Detalle.Add DetalleItem
-    Next Item
-
-    Igv.Add "ideTributo", "1000" ' catálogo 5
-    Igv.Add "nomTributo", "IGV"
-    Igv.Add "codTipTributo", "VAT"
-    Igv.Add "mtoBaseImponible", Format(Invoice.SubTotal, "0.00")
-    Igv.Add "mtoTributo", Format(Invoice.Igv, "0.00")
-    Tributos.Add Igv
-    
-    Leyenda.Add "codLeyenda", "1000"
-    Leyenda.Add "desLeyenda", AmountInLetters(Invoice.Total, Invoice.TypeCurrency)
-    Leyendas.Add Leyenda
-
-    Data.Add "cabecera", Cabecera
-    Data.Add "detalle", Detalle
-    Data.Add "tributos", Tributos
-    Data.Add "leyendas", Leyendas
-
-    If Pretty Then
-        InvoiceToJson = ConvertToJson(Data, 2)
-    Else
-        InvoiceToJson = ConvertToJson(Data)
-    End If
-End Function
-
-Public Sub SendElectronicDocument(DocType As String, DocNumber As String)
-    Dim Body As New Dictionary
-    Dim EndPoint As String
-
-    Body.Add "num_ruc", Prop.Company.Ruc
-    Body.Add "tip_docu", DocType
-    Body.Add "num_docu", DocNumber
-    EndPoint = "http://localhost:" & Prop.Sfs.Port & "/api/enviarXML.htm"
-    
-    If Post(EndPoint, ConvertToJson(Body)) Then
-        DebugLog "El comprobante electrónico " & DocNumber & " se envió a la SUNAT correctamente.", "SendElectronicDocument"
-    Else
-        ErrorLog "Error al enviar el documento electrónico " & DocNumber & " a la SUNAT.", "SendElectronicDocument"
-    End If
-End Sub
-
-Public Sub GenerateElectronicDocument(DocType As String, DocNumber As String)
-    Dim Body As New Dictionary
-    Dim EndPoint As String
-    
-    Body.Add "num_ruc", Prop.Company.Ruc
-    Body.Add "tip_docu", DocType
-    Body.Add "num_docu", DocNumber
-    EndPoint = "http://localhost:" & Prop.Sfs.Port & "/api/GenerarComprobante.htm"
-    
-    If Post(EndPoint, ConvertToJson(Body)) Then
-        DebugLog "El comprobante electrónico " & DocNumber & " se generó correctamente.", "GenerateElectronicDocument"
-    Else
-        ErrorLog "Error al generar el documento electrónico " & DocNumber, "GenerateElectronicDocument"
-    End If
-End Sub

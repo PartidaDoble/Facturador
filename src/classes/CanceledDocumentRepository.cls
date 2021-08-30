@@ -10,28 +10,22 @@ Attribute VB_Exposed = False
 Option Explicit
 
 Public Function GetAll() As Collection
-    Dim CanceledDocument As CanceledDocumentEntity
     Dim CanceledDocuments As New Collection
     Dim Row As Long
-
+    
     For Row = 2 To GetLastRow(sheetCanceledDocuments)
-        Set CanceledDocument = New CanceledDocumentEntity
-        
-        With sheetCanceledDocuments
-            CanceledDocument.GenerationDate = .Cells(Row, 2)
-            CanceledDocument.CommunicationDate = .Cells(Row, 3)
-            CanceledDocument.DocType = Format(.Cells(Row, 4), "00")
-            CanceledDocument.DocNumber = .Cells(Row, 5)
-            CanceledDocument.Motivo = .Cells(Row, 6)
-            CanceledDocument.Correlative = .Cells(Row, 7)
-            CanceledDocument.Situation = GetSituationFromCode(Left(.Cells(Row, 8), 2))
-            CanceledDocument.Observation = .Cells(Row, 9)
-        End With
-        
-        CanceledDocuments.Add CanceledDocument
+        CanceledDocuments.Add GetInstance(Row)
     Next Row
     
     Set GetAll = CanceledDocuments
+End Function
+
+Public Function GetItem(Id As String) As CanceledDocumentEntity
+    On Error GoTo HandleErrors
+    Set GetItem = GetInstance(GetMatchRow(sheetCanceledDocuments, 1, Id))
+    Exit Function
+HandleErrors:
+    Set GetItem = Nothing
 End Function
 
 Public Sub Add(CanceledDocument As CanceledDocumentEntity)
@@ -46,16 +40,29 @@ Public Sub Update(CanceledDocument As CanceledDocumentEntity)
     Save CanceledDocument, Row
 End Sub
 
+Private Function GetInstance(Row As Long) As CanceledDocumentEntity
+    Dim CanceledDocument As New CanceledDocumentEntity
+    
+    With sheetCanceledDocuments
+        CanceledDocument.CommunicationDate = .Cells(Row, 2)
+        CanceledDocument.Correlative = .Cells(Row, 3)
+        CanceledDocument.Situation = GetSituationFromCode(Left(.Cells(Row, 4), 2))
+        CanceledDocument.Observation = .Cells(Row, 5)
+        CanceledDocument.Ticket = .Cells(Row, 6)
+        CanceledDocument.Stored = IIf(.Cells(Row, 7) = "Sí", True, False)
+    End With
+    
+    Set GetInstance = CanceledDocument
+End Function
+
 Private Sub Save(CanceledDocument As CanceledDocumentEntity, Row As Long)
     With sheetCanceledDocuments
         .Cells(Row, 1) = CanceledDocument.Id
-        .Cells(Row, 2) = CanceledDocument.GenerationDate
-        .Cells(Row, 3) = CanceledDocument.CommunicationDate
-        .Cells(Row, 4) = CanceledDocument.DocType
-        .Cells(Row, 5) = CanceledDocument.DocNumber
-        .Cells(Row, 6) = CanceledDocument.Motivo
-        .Cells(Row, 7) = CanceledDocument.Correlative
-        .Cells(Row, 8) = GetSituationFromEnum(CanceledDocument.Situation)
-        .Cells(Row, 9) = CanceledDocument.Observation
+        .Cells(Row, 2) = CanceledDocument.CommunicationDate
+        .Cells(Row, 3) = CanceledDocument.Correlative
+        .Cells(Row, 4) = GetSituationFromEnum(CanceledDocument.Situation)
+        .Cells(Row, 5) = CanceledDocument.Observation
+        .Cells(Row, 6) = "'" & CanceledDocument.Ticket
+        .Cells(Row, 7) = IIf(CanceledDocument.Stored, "Sí", "No")
     End With
 End Sub

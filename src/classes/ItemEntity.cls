@@ -19,14 +19,26 @@ Public Quantity As Long
 
 Public UnitValue As Double
 
-Public Property Get Igv() As Double
-    Igv = Quantity * UnitValue * Prop.Rate.Igv
+Public IgvRate As Double
+
+Public Property Get UnitIgv() As Double
+    UnitIgv = UnitValue * IgvRate
+End Property
+
+Public Property Get UnitPrice() As Double
+    UnitPrice = UnitValue + UnitIgv
 End Property
 
 Public Property Get SaleValue() As Double
     SaleValue = Quantity * UnitValue
 End Property
 
+Public Property Get Igv() As Double
+    Igv = Quantity * UnitValue * IgvRate
+End Property
+
 Public Property Get SalePrice() As Double
     SalePrice = Quantity * UnitValue + Igv
 End Property
+
+

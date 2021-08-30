@@ -19,7 +19,7 @@ Public Function GetAll() As Collection
         
         With sheetProducts
             Product.Code = .Cells(Row, 1)
-            Product.UnitMeasure = GetUnitMeasureFromName(.Cells(Row, 2))
+            Product.UnitMeasure = .Cells(Row, 2)
             Product.Description = .Cells(Row, 3)
             Product.UnitPrice = .Cells(Row, 4)
         End With

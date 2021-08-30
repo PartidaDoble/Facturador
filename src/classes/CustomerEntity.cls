@@ -14,3 +14,17 @@ Public DocType As String
 Public DocNumber As String
 
 Public Name As String
+
+Public Address As String
+
+Public Ubigeo As String
+
+Public Email As String
+
+Public Function HasValidAddress() As Boolean
+    HasValidAddress = Address <> Empty And Ubigeo <> Empty And Len(Ubigeo) = 6
+End Function
+
+Public Function GetDocName() As String
+    GetDocName = IIf(DocType = "6", "RUC", "DNI")
+End Function

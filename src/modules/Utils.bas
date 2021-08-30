@@ -1,8 +1,102 @@
 Attribute VB_Name = "Utils"
 Option Explicit
 
-Public Function GetLastRow(Sheet As Worksheet) As Long
-    GetLastRow = Sheet.Cells(Rows.Count, 1).End(xlUp).Row
+Public Function IsValidDate(DateStr As String) As Boolean
+    If IIf(IsDate(DateStr), Format(CDate(DateStr), "dd/mm/yyyy"), "") = DateStr Then
+        IsValidDate = True
+    End If
+End Function
+
+Public Sub MaximizeRibbon()
+    On Error Resume Next
+    If CommandBars("Ribbon").Height < 100 Then CommandBars.ExecuteMso "MinimizeRibbon"
+End Sub
+
+Public Function ThereIsInternet() As Boolean
+    On Error GoTo HandleErrors
+    Dim XMLPage As New MSXML2.XMLHTTP60
+    
+    XMLPage.Open "HEAD", "https://www.google.com/", False
+    XMLPage.send
+    
+    ThereIsInternet = XMLPage.Status = 200
+    Exit Function
+HandleErrors:
+    MsgBox "Necesita una conexión a internet para realizar esta operación.", vbCritical, "No tiene conexión a internet"
+End Function
+
+Public Function FilterUnique(Data As Collection) As Collection
+    Dim Unique As New Collection
+    Dim Item As Variant
+    Dim Dict As New Dictionary
+    Dim Key As Variant
+    
+    For Each Item In Data
+        Dict(Item) = 0
+    Next Item
+    
+    For Each Key In Dict.Keys
+        Unique.Add Key
+    Next Key
+    
+    Set FilterUnique = Unique
+End Function
+
+Public Function LoadColumnData(Sheet As Worksheet, Column As Long, StartRow As Long, EndRow As Long) As Collection
+    Dim Row As Long
+    Dim Data As New Collection
+    
+    For Row = StartRow To EndRow
+        Data.Add Sheet.Cells(Row, Column).Value
+    Next Row
+    
+    Set LoadColumnData = Data
+End Function
+
+Public Function PathJoin(ParamArray Values() As Variant) As String
+    Dim fs As New FileSystemObject
+    Dim Value As Variant
+    Dim Path As String
+    
+    For Each Value In Values
+        Path = fs.BuildPath(Path, Value)
+    Next Value
+    
+    PathJoin = Path
+End Function
+
+Public Function CollectionToArray(Data As Collection) As Variant
+    Dim Result As Variant
+    Dim i As Long
+
+    ReDim Result(Data.Count - 1)
+
+    For i = 0 To Data.Count - 1
+        Result(i) = Data(i + 1)
+    Next i
+
+    CollectionToArray = Result
+End Function
+
+Public Function CharCount(Str As String, Char As String)
+    CharCount = Len(Str) - Len(Replace(Str, Char, ""))
+End Function
+
+Public Sub WriteFile(FilePath As String, Data As String)
+    Dim fs As New FileSystemObject
+    Dim Stream As TextStream
+    Set Stream = fs.CreateTextFile(FilePath)
+    Stream.Write Data
+    Stream.Close
+End Sub
+
+Public Function GetLastRow(Sheet As Worksheet, Optional Column As Long = 1) As Long
+    GetLastRow = Sheet.Cells(Rows.Count, Column).End(xlUp).Row
+End Function
+
+Public Function GetMatchRow(Sheet As Worksheet, Column As Long, Value As String) As Long
+    On Error Resume Next
+    GetMatchRow = WorksheetFunction.Match(Value, Sheet.Columns(Column), 0)
 End Function
 
 Public Function GetXmlContentFromZip(ZipPath As String, XmlName As String) As String
@@ -34,82 +128,15 @@ HandleErrors:
     ErrorLog "Error al extraer el contenido del archivo " & XmlName, "GetXmlContentFromZip", Err.Number
 End Function
 
-Public Function TaxLess(Amount As Double, TaxRate As Double) As Double
-    TaxLess = Amount / (TaxRate + 1)
+Public Function TaxLess(amount As Double, TaxRate As Double) As Double
+    TaxLess = amount / (TaxRate + 1)
 End Function
 
 Public Function TaxPlus(TaxBase As Double, TaxRate As Double) As Double
     TaxPlus = TaxBase + TaxBase * TaxRate
 End Function
 
-Public Sub TraceLog(Message As String, Optional From As String = Empty)
-    SettingLog
-    LogTrace Message, From
-End Sub
-
-Public Sub DebugLog(Message As String, Optional From As String = Empty)
-    SettingLog
-    LogDebug Message, From
-End Sub
-
-Public Sub InfoLog(Message As String, Optional From As String = Empty)
-    SettingLog
-    LogInfo Message, From
-End Sub
-
-Public Sub WarnLog(Message As String, Optional From As String = Empty)
-    SettingLog
-    LogWarn Message, From
-End Sub
-
-Public Sub ErrorLog(Message As String, Optional From As String = Empty, Optional ErrNumber As Long = 0)
-    SettingLog
-    LogError Message, From, ErrNumber
-End Sub
-
-Private Sub SettingLog()
-    LogEnabled = True
-
-    If Prop.App.Env = "production" Then
-        LogCallback = "LogFile"
-        LogThreshold = 3
-    End If
-End Sub
-
-Public Sub LogFile(Level As Long, Message As String, From As String)
-    On Error Resume Next
-    Dim fs As New FileSystemObject
-    Dim Stream As TextStream
-    Dim LevelName As String
-    Dim LogFilePath As String
-    
-    LogEnabled = True
-    
-    Select Case Level
-        Case 1
-            LevelName = "Trace"
-        Case 2
-            LevelName = "Debug"
-        Case 3
-            LevelName = "Info "
-        Case 4
-            LevelName = "WARN "
-        Case 5
-            LevelName = "ERROR"
-    End Select
-
-    LogFilePath = fs.BuildPath(ThisWorkbook.Path, "facturador.log")
-    If fs.FileExists(LogFilePath) Then
-        Set Stream = fs.OpenTextFile(LogFilePath, ForAppending)
-    Else
-        Set Stream = fs.CreateTextFile(LogFilePath)
-    End If
-    
-    Stream.WriteLine Now & " " & LevelName & " - " & IIf(From <> "", From & ": ", "") & Message
-    Stream.Close
-End Sub
-
-Public Function AmountInLetters(Amount As Double, TypeCurrency As String) As String
+Public Function AmountInLetters(amount As Double, TypeCurrency As String) As String
     On Error Resume Next
     Dim WholePart As Long
     Dim DecimalPart As Long
@@ -117,8 +144,8 @@ Public Function AmountInLetters(Amount As Double, TypeCurrency As String) As Str
     Dim DecimalPartInLetters As String
     Dim CurrencyName As String
 
-    WholePart = Int(Amount)
-    DecimalPart = Round(Amount - WholePart, 2) * 100
+    WholePart = Int(amount)
+    DecimalPart = Round(amount - WholePart, 2) * 100
 
     WholePartInLetters = UCase(NumberToWords(WholePart))
     DecimalPartInLetters = "CON " & Format(DecimalPart, "00") & "/100"
@@ -126,7 +153,7 @@ Public Function AmountInLetters(Amount As Double, TypeCurrency As String) As Str
     
     AmountInLetters = WholePartInLetters & " " & DecimalPartInLetters & " " & CurrencyName
 
-    If 1000 <= Amount And Amount < 2000 Then
+    If 1000 <= amount And amount < 2000 Then
         AmountInLetters = "UN " & AmountInLetters
     End If
 End Function
@@ -183,120 +210,4 @@ Private Function NumberToWords(valor) As String
            If (valor - Int(valor / 1000000000000#) * 1000000000000#) _
                Then NumberToWords = NumberToWords & " " & NumberToWords(valor - Int(valor / 1000000000000#) * 1000000000000#)
    End Select
-End Function
-
-Public Function GetUnitMeasureFromCode(Code As String) As String
-    Select Case Code
-        Case "NIU"
-            GetUnitMeasureFromCode = "UNIDAD"
-        Case "KGM"
-            GetUnitMeasureFromCode = "KILOGRAMO"
-        Case "LBR"
-            GetUnitMeasureFromCode = "LIBRA"
-        Case "GRM"
-            GetUnitMeasureFromCode = "GRAMO"
-        Case "BX"
-            GetUnitMeasureFromCode = "CAJA"
-        Case "GLL"
-            GetUnitMeasureFromCode = "GALON"
-        Case "BLL"
-            GetUnitMeasureFromCode = "BARRIL"
-        Case "CA"
-            GetUnitMeasureFromCode = "LATA"
-        Case "MIL"
-            GetUnitMeasureFromCode = "MILLAR"
-        Case "MTQ"
-            GetUnitMeasureFromCode = "METRO CUBICO"
-        Case "MTR"
-            GetUnitMeasureFromCode = "METRO"
-        Case Else
-            GetUnitMeasureFromCode = "UNIDAD"
-    End Select
-End Function
-
-Public Function GetUnitMeasureFromName(UnitMeasureName As String) As String
-    Select Case UnitMeasureName
-        Case "UNIDAD"
-            GetUnitMeasureFromName = "NIU"
-        Case "KILOGRAMO"
-            GetUnitMeasureFromName = "KGM"
-        Case "LIBRA"
-            GetUnitMeasureFromName = "LBR"
-        Case "GRAMO"
-            GetUnitMeasureFromName = "GRM"
-        Case "CAJA"
-            GetUnitMeasureFromName = "BX"
-        Case "GALON"
-            GetUnitMeasureFromName = "GLL"
-        Case "BARRIL"
-            GetUnitMeasureFromName = "BLL"
-        Case "LATA"
-            GetUnitMeasureFromName = "CA"
-        Case "MILLAR"
-            GetUnitMeasureFromName = "MIL"
-        Case "METRO CUBICO"
-            GetUnitMeasureFromName = "MTQ"
-        Case "METRO"
-            GetUnitMeasureFromName = "MTR"
-        Case Else
-            GetUnitMeasureFromName = "NIU"
-    End Select
-End Function
-
-Public Function GetSituationFromEnum(Situation As SituationEnum) As String
-    Select Case Situation
-        Case CdpPorGenerarXml
-            GetSituationFromEnum = "01 - por generar xml"
-        Case CdpXmlGenerado
-            GetSituationFromEnum = "02 - xml generado"
-        Case CdpEnviadoAceptado
-            GetSituationFromEnum = "03 - enviado y aceptado sunat"
-        Case CdpEnviadoAceptadoConObs
-            GetSituationFromEnum = "04 - enviado y aceptado sunat con obs."
-        Case CdpRechazado
-            GetSituationFromEnum = "05 - rechazado por sunat"
-        Case CdpConErrores
-            GetSituationFromEnum = "06 - con errores"
-        Case CdpPorValidarXml
-            GetSituationFromEnum = "07 - por validar xml"
-        Case CdpEnviadoPorProcesar
-            GetSituationFromEnum = "08 - enviado a sunat por procesar"
-        Case CdpEnviadoProcesando
-            GetSituationFromEnum = "09 - enviado a sunat procesando"
-        Case CdpRechazado10
-            GetSituationFromEnum = "10 - rechazado por sunat"
-        Case CdpEnviadoAceptado11
-            GetSituationFromEnum = "11 - enviado y aceptado sunat"
-        Case CdpEnviadoAceptadoConObs12
-            GetSituationFromEnum = "12 - enviado y aceptado sunat"
-    End Select
-End Function
-
-Public Function GetSituationFromCode(Code As String) As SituationEnum
-    Select Case Code
-        Case "01"
-            GetSituationFromCode = CdpPorGenerarXml
-        Case "02"
-            GetSituationFromCode = CdpXmlGenerado
-        Case "03"
-            GetSituationFromCode = CdpEnviadoAceptado
-        Case "04"
-            GetSituationFromCode = CdpEnviadoAceptadoConObs
-        Case "05"
-            GetSituationFromCode = CdpRechazado
-        Case "06"
-            GetSituationFromCode = CdpConErrores
-        Case "07"
-            GetSituationFromCode = CdpPorValidarXml
-        Case "08"
-            GetSituationFromCode = CdpEnviadoPorProcesar
-        Case "09"
-            GetSituationFromCode = CdpEnviadoProcesando
-        Case "10"
-            GetSituationFromCode = CdpRechazado10
-        Case "11"
-            GetSituationFromCode = CdpEnviadoAceptado11
-        Case "12"
-            GetSituationFromCode = CdpEnviadoAceptadoConObs12
-    End Select
 End Function
