@@ -29,3 +29,11 @@ Private Sub TaxPlusTest()
         .AssertEquals 100, TaxPlus(84.7457627118644, 0.18)
     End With
 End Sub
+
+Private Sub PathJoinTest()
+    With Test.It("TaxPlusTest")
+        .AssertEquals "", PathJoin()
+        .AssertEquals "foo\bar", PathJoin("foo", "bar")
+        .AssertEquals "foo\bar\baz", PathJoin("foo", "bar", "baz")
+    End With
+End Sub
