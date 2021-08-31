@@ -2,9 +2,11 @@ Attribute VB_Name = "Utils"
 Option Explicit
 
 Public Function IsValidDate(DateStr As String) As Boolean
+    On Error GoTo HandleErrors
     If IIf(IsDate(DateStr), Format(CDate(DateStr), "dd/mm/yyyy"), "") = DateStr Then
         IsValidDate = True
     End If
+HandleErrors:
 End Function
 
 Public Sub MaximizeRibbon()

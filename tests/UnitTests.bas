@@ -1,39 +1,65 @@
 Attribute VB_Name = "UnitTests"
 Option Explicit
 
-Private Sub RunAllModuleTests()
-    AmountInLettersTest
-    TaxLessTest
-    TaxPlusTest
+Private Sub RunAllTests()
+    ItemEntityTest
+    InvoiceEntityTest
 End Sub
 
-Private Sub AmountInLettersTest()
-    With Test.It("AmountInLettersTest")
-        .AssertEquals "UN CON 00/100 SOLES", AmountInLetters(1, "PEN")
-        .AssertEquals "CIENTO CINCUENTA Y TRES CON 45/100 SOLES", AmountInLetters(153.45, "PEN")
-        .AssertEquals "UN MIL OCHOCIENTOS CUARENTA Y CINCO CON 40/100 SOLES", AmountInLetters(1845.4, "PEN")
-        .AssertEquals "TREINTA Y CINCO MIL OCHOCIENTOS SESENTA Y DOS CON 80/100 DÓLARES AMERICANOS", AmountInLetters(35862.8, "USD")
+Private Sub ItemEntityTest()
+    Dim Item As New ItemEntity
+
+    Item.Quantity = 2
+    Item.UnitValue = 50
+    Item.IgvRate = 0.18
+    
+    With Test.It("IGV unitario")
+        .AssertEquals 9, Item.UnitIgv
+    End With
+    
+    With Test.It("Precio de venta unitario")
+        .AssertEquals 59, Item.UnitPrice
+    End With
+
+    With Test.It("Valor de venta (cantidad * valor unitario)")
+        .AssertEquals 100, Item.SaleValue
+    End With
+    
+    With Test.It("IGV")
+        .AssertEquals 18, Item.Igv
+    End With
+
+    With Test.It("Precio de de venta (cantidad * valor unitario + IGV")
+        .AssertEquals 118, Item.SalePrice
     End With
 End Sub
 
-Private Sub TaxLessTest()
-    With Test.It("TaxLessTest")
-        .AssertEquals 100, TaxLess(118, 0.18)
-        .AssertEquals 84.7457627118644, TaxLess(100, 0.18)
-    End With
-End Sub
+Private Sub InvoiceEntityTest()
+    Dim Invoice As New InvoiceEntity
+    Dim Item1 As New ItemEntity
+    Dim Item2 As New ItemEntity
 
-Private Sub TaxPlusTest()
-    With Test.It("TaxPlusTest")
-        .AssertEquals 118, TaxPlus(100, 0.18)
-        .AssertEquals 100, TaxPlus(84.7457627118644, 0.18)
-    End With
-End Sub
+    Item1.Quantity = 2
+    Item1.UnitValue = 50
+    Item1.IgvRate = 0.18
+    
 
-Private Sub PathJoinTest()
-    With Test.It("TaxPlusTest")
-        .AssertEquals "", PathJoin()
-        .AssertEquals "foo\bar", PathJoin("foo", "bar")
-        .AssertEquals "foo\bar\baz", PathJoin("foo", "bar", "baz")
+    Item2.Quantity = 4
+    Item2.UnitValue = 50
+    Item2.IgvRate = 0.18
+    
+    Invoice.AddItem Item1
+    Invoice.AddItem Item2
+
+    With Test.It("Sub total = suma del valor de venta de cata item")
+        .AssertEquals 300, Invoice.SubTotal
+    End With
+
+    With Test.It("IGV = suma del IGV de cada item")
+        .AssertEquals 54, Invoice.Igv
+    End With
+
+    With Test.It("Total = suma del precio de venta de cada item")
+        .AssertEquals 354, Invoice.Total
     End With
 End Sub

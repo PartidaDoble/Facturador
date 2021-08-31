@@ -107,11 +107,11 @@ Public Function IsNote() As Boolean
 End Function
 
 Public Function IsInvoiceNote() As Boolean
-    IsInvoiceNote = IsNote And Left(DocSerie, 1) = "F" And NoteInfo.RefDocType = "01"
+    IsInvoiceNote = IsNote And Left(DocSerie, 1) = "F"
 End Function
 
 Public Function IsBoletaNote() As Boolean
-    IsBoletaNote = IsNote And Left(DocSerie, 1) = "B" And NoteInfo.RefDocType = "03"
+    IsBoletaNote = IsNote And Left(DocSerie, 1) = "B"
 End Function
 
 Public Function IsCanceled() As Boolean
