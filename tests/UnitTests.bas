@@ -6,30 +6,34 @@ Private Sub RunAllTests()
     InvoiceEntityTest
 End Sub
 
-Private Sub ItemEntityTest()
+Private Sub ItemEntityTests()
     Dim Item As New ItemEntity
-
+    
     Item.Quantity = 2
     Item.UnitValue = 50
     Item.IgvRate = 0.18
     
-    With Test.It("IGV unitario")
+    With Test.It("Item.UnitIgv")
         .AssertEquals 9, Item.UnitIgv
     End With
     
-    With Test.It("Precio de venta unitario")
+    With Test.It("Item.UnitPrice")
         .AssertEquals 59, Item.UnitPrice
     End With
-
-    With Test.It("Valor de venta (cantidad * valor unitario)")
+    
+    With Test.It("Item.SaleValue (cantidad * valor unitario)")
         .AssertEquals 100, Item.SaleValue
     End With
     
-    With Test.It("IGV")
+    With Test.It("Item.Igv")
         .AssertEquals 18, Item.Igv
     End With
-
-    With Test.It("Precio de de venta (cantidad * valor unitario + IGV")
+    
+    With Test.It("Item.SalePrice ((cantidad * valor unitario) + IGV")
+        .AssertEquals 118, Item.SalePrice
+    End With
+    
+    With Test.It("Item.SalePrice ((cantidad * valor unitario) + IGV")
         .AssertEquals 118, Item.SalePrice
     End With
 End Sub

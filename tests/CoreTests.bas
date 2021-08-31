@@ -5,6 +5,10 @@ Private Sub RunAllModuleTests()
     generar_archivo_json_de_boleta_de_venta_con_un_item
     generar_archivo_json_de_cuando_el_cp_esta_en_dolares
     generar_archivo_json_de_boleta_de_venta_con_dos_items
+    NotaTest
+    BoletaTest
+    ResumenDiarioBoletas_UnaBoleta
+    ResumenDiarioBoletas_DosBoletas
 End Sub
 
 Private Sub generar_archivo_json_de_boleta_de_venta_con_un_item()

@@ -34,7 +34,7 @@ Public Property Get Company() As CompanyType
         pCompany.NroCtaDetraction = Trim(.Cells(Row, 2))
         
         ' Datos adicionales de la empresa
-        Row = 7
+        Row = 23
         Row = Row + 1
         pCompany.TradeName = Trim(.Cells(Row, 2))
         

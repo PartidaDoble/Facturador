@@ -160,8 +160,8 @@ Public Function DocumentToJson(Document As DocumentEntity, Optional Pretty As Bo
         DetalleItem.Add "codTipTributoIgvItem", "VAT"
         DetalleItem.Add "tipAfeIGV", "10"
         DetalleItem.Add "porIgvItem", "18.00"
-        DetalleItem.Add "mtoPrecioVentaUnitario", Format(Item.UnitValue + (Item.UnitValue * Prop.Rate.Igv), "0.00")
-        DetalleItem.Add "mtoValorVentaItem", Format(Item.Quantity * Item.UnitValue, "0.00")
+        DetalleItem.Add "mtoPrecioVentaUnitario", Format(Item.UnitPrice, "0.00")
+        DetalleItem.Add "mtoValorVentaItem", Format(Item.SaleValue, "0.00")
         Detalle.Add DetalleItem
     Next Item
     
