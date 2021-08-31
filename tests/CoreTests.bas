@@ -291,8 +291,3 @@ Private Sub ResumenDiarioBoletas_DosBoletas()
         .AssertEquals Expected, DailySummaryToJson(Documents, CDate("26/07/2021"), False)
     End With
 End Sub
-
-Public Function Test() As VBAUnit
-    Dim UnitTest As New VBAUnit
-    Set Test = UnitTest
-End Function

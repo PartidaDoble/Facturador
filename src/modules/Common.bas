@@ -92,3 +92,8 @@ Public Function DB() As Database
     DatabaseInstance.DebugMode = False
     Set DB = DatabaseInstance
 End Function
+
+Public Function Test() As VBAUnit
+    Dim UnitTest As New VBAUnit
+    Set Test = UnitTest
+End Function

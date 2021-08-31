@@ -84,10 +84,10 @@ End Sub
 
 Private Sub IsValidDateTest()
     With Test.It("FilterUnique")
-        .AssertEquals True, IsValidDate("15/09/2021")
-        .AssertEquals False, IsValidDate("15/19/2021")
-        .AssertEquals False, IsValidDate("15/9/2021")
-        .AssertEquals False, IsValidDate("5/09/2021")
-        .AssertEquals False, IsValidDate("5/09/21")
+        .AssertTrue IsValidDate("15/09/2021")
+        .AssertFalse IsValidDate("15/19/2021")
+        .AssertFalse IsValidDate("15/9/2021")
+        .AssertFalse IsValidDate("5/09/2021")
+        .AssertFalse IsValidDate("5/09/21")
     End With
 End Sub
