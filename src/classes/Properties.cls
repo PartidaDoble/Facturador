@@ -56,7 +56,7 @@ Public Property Get Sfs() As SfsType
     
     With sheetSetting
         ' Facturador SUNAT
-        Row = 13
+        Row = 7
         Row = Row + 1
         pSfs.Path = Trim(.Cells(Row, 2))
 
@@ -76,34 +76,37 @@ Public Property Get App() As AppType
     
     With sheetSetting
         ' Facturador excel
-        Row = 16
+        Row = 10
         Row = Row + 1
         pApp.DocDirName = Trim(.Cells(Row, 2))
-        
-        Row = Row + 1
-        pApp.PrintMode = IIf(.Cells(Row, 2) = "A4", PrintA4, IIf(.Cells(Row, 2) = "Ticket", PrintTicket, PrintSfs))
-        
-        Row = Row + 1
-        pApp.TicketItemInTwoLines = .Cells(Row, 2) = "Sí"
-        
-        Row = Row + 1
-        pApp.A4CenterCompanyData = .Cells(Row, 2) = "Sí"
         
         Row = Row + 1
         pApp.AutoProdCode = .Cells(Row, 2) = "Automático"
         
         Row = Row + 1
         pApp.LogLevel = IIf(.Cells(Row, 2) = "Depuración", 2, 0)
+        
+        
+        ' Facturador excel (Premium)
+        Row = 18
+        Row = Row + 1
+        pApp.PrintMode = IIf(.Cells(Row, 2) = "A4", PrintA4, IIf(.Cells(Row, 2) = "Ticket", PrintTicket, PrintSfs))
+        
+        Row = Row + 1
+        pApp.A4CenterCompanyData = .Cells(Row, 2) = "Sí"
+        
+        Row = Row + 1
+        pApp.TicketItemInTwoLines = .Cells(Row, 2) = "Sí"
     End With
-
-    pApp.Env = EnvLocal
+    
+    pApp.Env = EnvProduction
     
     pApp.Premium = True
     App = pApp
 End Property
 
 Public Property Get Rate() As RateType
-    pRate.Igv = sheetSetting.Cells(23, 2) / 100
+    pRate.Igv = sheetSetting.Cells(14, 2) / 100
     Rate = pRate
 End Property
 
@@ -112,7 +115,7 @@ Public Property Get Email() As EmailType
     
     With sheetSetting
         ' Correo electrónico
-        Row = 25
+        Row = 29
         Row = Row + 1
         pEmail.Provider = IIf(.Cells(Row, 2) = "Gmail", GmailProv, OutlookProv)
         
@@ -129,7 +132,7 @@ Public Property Get Email() As EmailType
         pEmail.Message = Trim(.Cells(Row, 2))
         
         ' Firma del correo electrónico
-        Row = 32
+        Row = 36
         Row = Row + 1
         pEmail.SignatureEmployeeName = Trim(.Cells(Row, 2))
         

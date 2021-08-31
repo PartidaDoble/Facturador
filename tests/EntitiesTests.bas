@@ -1,7 +1,7 @@
 Attribute VB_Name = "EntitiesTests"
 Option Explicit
 
-Private Sub RunAllModuleTests()
+Private Sub RunAllTests()
     ItemEntityTest
     InvoiceEntityTest
 End Sub
