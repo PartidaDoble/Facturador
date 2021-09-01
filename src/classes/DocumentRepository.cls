@@ -84,7 +84,7 @@ Private Function GetInstance(Row As Long) As DocumentEntity
             
             Detraction.Code = DetractionArray(0)
             Detraction.Percentage = DetractionArray(1)
-            Detraction.amount = DetractionArray(2)
+            Detraction.Amount = DetractionArray(2)
             Detraction.PaymentMethod = DetractionArray(3)
             
             Set Document.Detraction = Detraction

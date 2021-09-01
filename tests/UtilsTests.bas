@@ -12,6 +12,11 @@ Private Sub RunTests()
     IsValidDateTest
 End Sub
 
+Public Function Test() As VBAUnit
+    Dim UnitTest As New VBAUnit
+    Set Test = UnitTest
+End Function
+
 Private Sub AmountInLettersTest()
     With Test.It("AmountInLetters")
         .AssertEquals "UN CON 00/100 SOLES", AmountInLetters(1, "PEN")

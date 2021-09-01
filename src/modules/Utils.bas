@@ -130,15 +130,15 @@ HandleErrors:
     ErrorLog "Error al extraer el contenido del archivo " & XmlName, "GetXmlContentFromZip", Err.Number
 End Function
 
-Public Function TaxLess(amount As Double, TaxRate As Double) As Double
-    TaxLess = amount / (TaxRate + 1)
+Public Function TaxLess(Amount As Double, TaxRate As Double) As Double
+    TaxLess = Amount / (TaxRate + 1)
 End Function
 
 Public Function TaxPlus(TaxBase As Double, TaxRate As Double) As Double
     TaxPlus = TaxBase + TaxBase * TaxRate
 End Function
 
-Public Function AmountInLetters(amount As Double, TypeCurrency As String) As String
+Public Function AmountInLetters(Amount As Double, TypeCurrency As String) As String
     On Error Resume Next
     Dim WholePart As Long
     Dim DecimalPart As Long
@@ -146,8 +146,8 @@ Public Function AmountInLetters(amount As Double, TypeCurrency As String) As Str
     Dim DecimalPartInLetters As String
     Dim CurrencyName As String
 
-    WholePart = Int(amount)
-    DecimalPart = Round(amount - WholePart, 2) * 100
+    WholePart = Int(Amount)
+    DecimalPart = Round(Amount - WholePart, 2) * 100
 
     WholePartInLetters = UCase(NumberToWords(WholePart))
     DecimalPartInLetters = "CON " & Format(DecimalPart, "00") & "/100"
@@ -155,7 +155,7 @@ Public Function AmountInLetters(amount As Double, TypeCurrency As String) As Str
     
     AmountInLetters = WholePartInLetters & " " & DecimalPartInLetters & " " & CurrencyName
 
-    If 1000 <= amount And amount < 2000 Then
+    If 1000 <= Amount And Amount < 2000 Then
         AmountInLetters = "UN " & AmountInLetters
     End If
 End Function

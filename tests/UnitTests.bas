@@ -3,7 +3,7 @@ Option Explicit
 
 Private Sub RunTests()
     ItemEntityTests
-    DocumentEntityTest
+    DocumentEntityTests
     DocumentEntity_MethodsTests
 End Sub
 
@@ -39,7 +39,7 @@ Private Sub ItemEntityTests()
     End With
 End Sub
 
-Private Sub DocumentEntityTest()
+Private Sub DocumentEntityTests()
     Dim Document As New DocumentEntity
     Dim Item1 As New ItemEntity
     Dim Item2 As New ItemEntity

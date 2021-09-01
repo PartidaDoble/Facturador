@@ -60,7 +60,7 @@ Public Sub SendCanceledInvoicesAndNotes()
     Correlative = WorksheetFunction.MaxIfs(sheetCanceledDocuments.Columns(3), sheetCanceledDocuments.Columns(2), Date) + 1
     CanceledDocumentNumber = "RA-" & Format(Date, "yyyymmdd") & "-" & Format(Correlative, "000")
     FileName = Prop.Company.Ruc & "-" & CanceledDocumentNumber
-    CreateCanceledDocumentJsonFile FileName & ".json", Documents
+    CreateCanceledDocumentJsonFile FileName & ".json", Documents, Date
     
     RefreshSfsScreen
     GenerateElectronicDocument "RA", CanceledDocumentNumber

@@ -64,9 +64,9 @@ HandleErrors:
     ErrorLog "Error al crear el archivo JSON " & JsonFileName & " de resumen diario de boletas.", "CreateDailySummaryJsonFile", Err.Number
 End Sub
 
-Public Sub CreateCanceledDocumentJsonFile(JsonFileName As String, Documents As Collection)
+Public Sub CreateCanceledDocumentJsonFile(JsonFileName As String, Documents As Collection, SummaryDate As Date)
     On Error GoTo HandleErrors
-    WriteFile PathJoin(Prop.Sfs.DATAPath, JsonFileName), CanceledDocumentsToJson(Documents)
+    WriteFile PathJoin(Prop.Sfs.DATAPath, JsonFileName), CanceledDocumentsToJson(Documents, SummaryDate)
     DebugLog "El archivo JSON " & JsonFileName & " para anular comprobantes fue creado correctamente.", "CreateCanceledDocumentJsonFile"
     Exit Sub
 HandleErrors:
@@ -88,6 +88,7 @@ Public Function DocumentToJson(Document As DocumentEntity, Optional Pretty As Bo
     Cabecera.Add "tipOperacion", Document.OperationCode
     Cabecera.Add "fecEmision", Format(Document.Emission, "yyyy-mm-dd")
     Cabecera.Add "horEmision", Format(Document.EmissionTime, "HH:mm:ss")
+    Cabecera.Add "fecVencimiento", "-"
     Cabecera.Add "codLocalEmisor", Prop.Company.LocalCodeEmission
     
     If Document.Customer Is Nothing Then
@@ -123,7 +124,7 @@ Public Function DocumentToJson(Document As DocumentEntity, Optional Pretty As Bo
         AdicionalCabecera.Add "ctaBancoNacionDetraccion", Prop.Company.NroCtaDetraction
         AdicionalCabecera.Add "codBienDetraccion", Document.Detraction.Code
         AdicionalCabecera.Add "porDetraccion", CStr(Document.Detraction.Percentage)
-        AdicionalCabecera.Add "mtoDetraccion", Format(Document.Detraction.amount, "0.00")
+        AdicionalCabecera.Add "mtoDetraccion", Format(Document.Detraction.Amount, "0.00")
         AdicionalCabecera.Add "codMedioPago", Document.Detraction.PaymentMethod
         
         Set Leyenda = New Dictionary
@@ -159,7 +160,7 @@ Public Function DocumentToJson(Document As DocumentEntity, Optional Pretty As Bo
         DetalleItem.Add "nomTributoIgvItem", "IGV"
         DetalleItem.Add "codTipTributoIgvItem", "VAT"
         DetalleItem.Add "tipAfeIGV", "10"
-        DetalleItem.Add "porIgvItem", "18.00"
+        DetalleItem.Add "porIgvItem", Format(Prop.Rate.Igv * 100, "0.00")
         DetalleItem.Add "mtoPrecioVentaUnitario", Format(Item.UnitPrice, "0.00")
         DetalleItem.Add "mtoValorVentaItem", Format(Item.SaleValue, "0.00")
         Detalle.Add DetalleItem
@@ -222,15 +223,16 @@ Public Function DailySummaryToJson(Documents As Collection, SummaryDate As Date,
         SummaryDocument.Add "totValGratuito", "0.00"
         SummaryDocument.Add "totOtroCargo", "0.00"
         SummaryDocument.Add "totImpCpe", Format(Document.Total, "0.00")
-        SummaryDocument.Add "tipEstado", Document.GetState
         
         If Not Document.NoteInfo Is Nothing Then
             If Document.IsBoletaNote Then
                 SummaryDocument.Add "tipDocModifico", Document.NoteInfo.RefDocType
                 SummaryDocument.Add "serDocModifico", Document.NoteInfo.RefDocSerie
-                SummaryDocument.Add "numDocModifico", Document.NoteInfo.RefDocNumber
+                SummaryDocument.Add "numDocModifico", Format(Document.NoteInfo.RefDocNumber, "00000000")
             End If
         End If
+        
+        SummaryDocument.Add "tipEstado", Document.GetState
         
         DocumentCounter = DocumentCounter + 1
         Set Tributos = New Dictionary
@@ -258,7 +260,7 @@ Public Function DailySummaryToJson(Documents As Collection, SummaryDate As Date,
     End If
 End Function
 
-Public Function CanceledDocumentsToJson(Documents As Collection, Optional Pretty As Boolean = True) As String
+Public Function CanceledDocumentsToJson(Documents As Collection, SummaryDate As Date, Optional Pretty As Boolean = True) As String
     Dim Document As DocumentEntity
     Dim Data As New Dictionary
     Dim CanceledDocument As Dictionary
@@ -268,7 +270,7 @@ Public Function CanceledDocumentsToJson(Documents As Collection, Optional Pretty
         Set CanceledDocument = New Dictionary
         
         CanceledDocument.Add "fecGeneracion", Format(Document.Emission, "yyyy-mm-dd")
-        CanceledDocument.Add "fecComunicacion", Format(Date, "yyyy-mm-dd")
+        CanceledDocument.Add "fecComunicacion", Format(SummaryDate, "yyyy-mm-dd")
         CanceledDocument.Add "tipDocBaja", Document.DocType
         CanceledDocument.Add "numDocBaja", Document.DocSerie & "-" & Format(Document.DocNumber, "00000000")
         CanceledDocument.Add "desMotivoBaja", Split(Document.CancelInfo, "|")(1)

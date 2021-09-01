@@ -13,12 +13,12 @@ Public Code As String
 
 Public Percentage As Integer
 
-Public amount As Double
+Public Amount As Double
 
 Public PaymentMethod As String
 
 Public Function ConcatData() As String
-    ConcatData = Join(Array(Code, Percentage, Format(amount, "#,##0.00"), PaymentMethod), "-")
+    ConcatData = Join(Array(Code, Percentage, Format(Amount, "#,##0.00"), PaymentMethod), "-")
 End Function
 
 Public Function Legend() As String
@@ -26,5 +26,5 @@ Public Function Legend() As String
 End Function
 
 Public Function LegendLarge() As String
-    LegendLarge = "OPERACIÓN SUJETA AL SPOT S/ " & Format(amount, "#,##0.00") & " (" & Percentage & "%)"
+    LegendLarge = "OPERACIÓN SUJETA AL SPOT S/ " & Format(Amount, "#,##0.00") & " (" & Percentage & "%)"
 End Function

@@ -13,16 +13,26 @@ Public Type CompanyType
     ContactInformation As String
 End Type
 
+Public Type SfsType
+    Port As String
+    Path As String
+    DATAPath As String
+    ENVIOPath As String
+    RPTAPath As String
+    REPOPath As String
+End Type
+
 Public Type AppType
-    Env As EnvironmentEnum
-    Internet As Boolean
-    AutoProdCode As Boolean
     DocDirName As String
+    AutoProdCode As Boolean
     LogLevel As Integer
-    Premium As Boolean
+    
     PrintMode As PrintModeEnum
-    TicketItemInTwoLines As Boolean
     A4CenterCompanyData As Boolean
+    TicketItemInTwoLines As Boolean
+    
+    Premium As Boolean
+    Env As EnvironmentEnum
 End Type
 
 Public Type EmailType
@@ -31,6 +41,7 @@ Public Type EmailType
     Address As String
     Password As String
     Message As String
+    
     SignatureEmployeeName As String
     SignatureDepartment As String
     SignaturePhoneNumber As String
@@ -39,15 +50,6 @@ End Type
 
 Public Type RateType
     Igv As Double
-End Type
-
-Public Type SfsType
-    Port As String
-    Path As String
-    DATAPath As String
-    ENVIOPath As String
-    RPTAPath As String
-    REPOPath As String
 End Type
 
 Public Enum EmailProviderEnum
@@ -91,9 +93,4 @@ Public Function DB() As Database
     DatabaseInstance.ConnectionString = "DRIVER=SQLite3 ODBC Driver;Database=" & PathJoin(Prop.Sfs.Path, "bd", "BDFacturador.db") & ";"
     DatabaseInstance.DebugMode = False
     Set DB = DatabaseInstance
-End Function
-
-Public Function Test() As VBAUnit
-    Dim UnitTest As New VBAUnit
-    Set Test = UnitTest
 End Function

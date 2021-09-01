@@ -123,7 +123,7 @@ Private Sub cmdSave_Click()
     If txtDetractionData <> Empty Then
         Detraction.Code = Split(txtDetractionData, "-")(0)
         Detraction.Percentage = Split(txtDetractionData, "-")(1)
-        Detraction.amount = Split(txtDetractionData, "-")(2)
+        Detraction.Amount = Split(txtDetractionData, "-")(2)
         Detraction.PaymentMethod = Split(txtDetractionData, "-")(3)
         
         OperationCode = "1001"
