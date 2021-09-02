@@ -99,8 +99,7 @@ Public Property Get App() As AppType
         pApp.TicketItemInTwoLines = .Cells(Row, 2) = "Sí"
     End With
     
-    pApp.Env = EnvProduction
-    
+    pApp.Env = EnvLocal
     pApp.Premium = True
     App = pApp
 End Property

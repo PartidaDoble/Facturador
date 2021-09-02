@@ -93,8 +93,8 @@ Private Sub cmdAdd_Click()
     
     If Not ValidFields Then Exit Sub
 
-    With frmInvoice.lstItems
-        If .ListCount >= 8 Then frmInvoice.lstItems.Width = 497
+    With frmDocument.lstItems
+        If .ListCount >= 8 Then frmDocument.lstItems.Width = 497
         p = .ListCount
         .AddItem txtDescription & Space(200)
         .List(p, 1) = Format(txtQuantity, "#,##0.00")
@@ -103,19 +103,7 @@ Private Sub cmdAdd_Click()
         .List(p, 4) = txtCode
         .List(p, 5) = txtUnitMeasure
     End With
-    FrmInvoiceCalculateTotals
-    
-    With frmNote.lstItems
-        If .ListCount >= 8 Then frmNote.lstItems.Width = 497
-        p = .ListCount
-        .AddItem txtDescription & Space(200)
-        .List(p, 1) = Format(txtQuantity, "#,##0.00")
-        .List(p, 2) = txtUnitPrice
-        .List(p, 3) = txtTotal
-        .List(p, 4) = txtCode
-        .List(p, 5) = txtUnitMeasure
-    End With
-    FrmNoteCalculateTotals
+    FrmDocumentCalculateTotals
     
     Unload Me
 End Sub

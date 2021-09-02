@@ -31,28 +31,16 @@ Public Sub SendElectronicDocument(DocType As String, DocNumber As String)
     End If
 End Sub
 
-Public Sub CreateInvoiceJsonFile(Invoice As DocumentEntity)
+Public Sub CreateDocumentJsonFile(Document As DocumentEntity)
     On Error GoTo HandleErrors
     Dim JsonFileName As String
 
-    JsonFileName = Prop.Company.Ruc & "-" & Invoice.Id & ".json"
-    WriteFile PathJoin(Prop.Sfs.DATAPath, JsonFileName), DocumentToJson(Invoice)
-    DebugLog "El archivo JSON " & JsonFileName & " fue creado correctamente.", "CreateInvoiceJsonFile"
+    JsonFileName = Prop.Company.Ruc & "-" & Document.Id & ".json"
+    WriteFile PathJoin(Prop.Sfs.DATAPath, JsonFileName), DocumentToJson(Document)
+    DebugLog "El archivo JSON " & JsonFileName & " fue creado correctamente.", "CreateDocumentJsonFile"
     Exit Sub
 HandleErrors:
-    ErrorLog "Error al crear el archivo JSON " & JsonFileName, "CreateInvoiceJsonFile", Err.Number
-End Sub
-
-Public Sub CreateNoteJsonFile(Note As DocumentEntity)
-    On Error GoTo HandleErrors
-    Dim JsonFileName As String
-
-    JsonFileName = Prop.Company.Ruc & "-" & Note.Id & ".json"
-    WriteFile PathJoin(Prop.Sfs.DATAPath, JsonFileName), DocumentToJson(Note)
-    DebugLog "El archivo JSON " & JsonFileName & " fue creado correctamente.", "CreateNoteJsonFile"
-    Exit Sub
-HandleErrors:
-    ErrorLog "Error al crear el archivo JSON " & JsonFileName, "CreateNoteJsonFile", Err.Number
+    ErrorLog "Error al crear el archivo JSON " & JsonFileName, "CreateDocumentJsonFile", Err.Number
 End Sub
 
 Public Sub CreateDailySummaryJsonFile(JsonFileName As String, Documents As Collection, SummaryDate As Date)

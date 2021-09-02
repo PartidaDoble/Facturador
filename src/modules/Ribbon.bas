@@ -4,51 +4,56 @@ Option Explicit
 Public Sub EmitInvoice(Control As IRibbonControl)
     If Not SfsPrepared Then Exit Sub
     
-    frmInvoice.Caption = "FACTURA"
-    frmInvoice.txtDocType = "01"
-    frmInvoice.cboDocSerie.List = CollectionToArray(GetInvoiceSeries)
-    frmInvoice.cboDocSerie = sheetSetting.Range("O1").Value
-    frmInvoice.txtDocNumber = NextCorrelativeNumber(sheetSetting.Range("O1"))
-    frmInvoice.lblCustomerDocType = "RUC:"
+    frmDocument.Caption = "FACTURA"
+    frmDocument.txtDocType = "01"
+    frmDocument.cboDocSerie.List = CollectionToArray(GetInvoiceSeries)
+    frmDocument.cboDocSerie = sheetSetting.Range("O1").Value
+    frmDocument.txtDocNumber = NextCorrelativeNumber(sheetSetting.Range("O1"))
+    frmDocument.lblCustomerDocType = "RUC:"
+    frmDocument.cmdReferenceDocument.Visible = False
     
     If Trim(Prop.Company.NroCtaDetraction) = Empty Then
-        frmInvoice.cmdShowDetraction.Visible = False
+        frmDocument.cmdShowDetraction.Visible = False
     End If
     
-    frmInvoice.Show
+    frmDocument.Show
 End Sub
 
 Public Sub EmitBoleta(Control As IRibbonControl)
     If Not SfsPrepared Then Exit Sub
     
-    frmInvoice.Caption = "BOLETA DE VENTA"
-    frmInvoice.txtDocType = "03"
-    frmInvoice.cboDocSerie.List = CollectionToArray(GetBoletaSeries)
-    frmInvoice.cboDocSerie = sheetSetting.Range("O2").Value
-    frmInvoice.txtDocNumber = NextCorrelativeNumber(sheetSetting.Range("O2"))
-    frmInvoice.lblCustomerDocType = "DNI:"
-    frmInvoice.cmdShowDetraction.Visible = False
-    frmInvoice.Show
+    frmDocument.Caption = "BOLETA DE VENTA"
+    frmDocument.txtDocType = "03"
+    frmDocument.cboDocSerie.List = CollectionToArray(GetBoletaSeries)
+    frmDocument.cboDocSerie = sheetSetting.Range("O2").Value
+    frmDocument.txtDocNumber = NextCorrelativeNumber(sheetSetting.Range("O2"))
+    frmDocument.lblCustomerDocType = "DNI:"
+    frmDocument.cmdShowDetraction.Visible = False
+    frmDocument.cmdReferenceDocument.Visible = False
+    
+    frmDocument.Show
 End Sub
 
 Public Sub EmitCreditNote(Control As IRibbonControl)
     If Not SfsPrepared Then Exit Sub
     
-    frmNote.Caption = "NOTA DE CRÉDITO"
-    frmNote.cboDocSerie.List = CollectionToArray(GetCreditNoteSeries)
-    frmNote.txtDocType = "07"
-    frmNote.cboMotive.List = Array("Anulación de la operación", "Anulación por error en el RUC", "Corrección por error en la descripción", "Descuento global", "Descuento por ítem", "Devolución total", "Devolución por ítem", "Bonificación", "Disminución en el valor", "Otros Conceptos")
-    frmNote.Show
+    frmDocument.Caption = "NOTA DE CRÉDITO"
+    frmDocument.cboDocSerie.List = CollectionToArray(GetCreditNoteSeries)
+    frmDocument.txtDocType = "07"
+    frmDocument.cmdShowDetraction.Visible = False
+    
+    frmDocument.Show
 End Sub
 
 Public Sub EmitDebitNote(Control As IRibbonControl)
     If Not SfsPrepared Then Exit Sub
     
-    frmNote.Caption = "NOTA DE DÉBITO"
-    frmNote.cboDocSerie.List = CollectionToArray(GetDebitNoteSeries)
-    frmNote.txtDocType = "08"
-    frmNote.cboMotive.List = Array("Intereses por mora", "Aumento en el valor", "Penalidades / otros conceptos")
-    frmNote.Show
+    frmDocument.Caption = "NOTA DE DÉBITO"
+    frmDocument.cboDocSerie.List = CollectionToArray(GetDebitNoteSeries)
+    frmDocument.txtDocType = "08"
+    frmDocument.cmdShowDetraction.Visible = False
+    
+    frmDocument.Show
 End Sub
 
 Public Sub CancelDocument(Control As IRibbonControl)

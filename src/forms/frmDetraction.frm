@@ -1,7 +1,7 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmDetraction 
    Caption         =   "DETRACCIÓN"
-   ClientHeight    =   3075
+   ClientHeight    =   2940
    ClientLeft      =   120
    ClientTop       =   465
    ClientWidth     =   9150.001
@@ -22,8 +22,8 @@ Private Sub cmdAdd_Click()
     
     DetractionData = Join(Array(Left(cboCode, 3), txtPercentage, Format(CDbl(txtAmount), "0.00"), Left(cboPaymentMethod, 3)), "-")
     
-    frmInvoice.txtDetractionData = DetractionData
-    frmInvoice.lblDetraction = "OPERACIÓN SUJETA AL SPOT " & txtAmount & " (" & txtPercentage & "%)"
+    frmDocument.txtDetractionData = DetractionData
+    frmDocument.lblDetraction = "OPERACIÓN SUJETA AL SPOT " & txtAmount & " (" & txtPercentage & "%)"
     Unload Me
 End Sub
 

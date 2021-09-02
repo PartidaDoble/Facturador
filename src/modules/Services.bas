@@ -105,7 +105,7 @@ Public Function SfsPrepared() As Boolean
             RunSfs
             MsgBox "El Facturador SUNAT no se está ejecutando.", vbCritical, ""
             MsgBox "Ejecutando el Facturador SUNAT automáticamente..." & Chr(13) & Chr(13) & _
-                   "Espere a que el Facturador SUNAT esté listo. Esto demora alrededor de un minuto (depende de la velocidad de su computadora)", vbInformation, "Ejecutando el Facturador SUNAT"
+                   "Espere a que el Facturador SUNAT esté listo. Esto puede demorar alrededor de un minuto (depende de la velocidad de su computadora)", vbInformation, "Ejecutando el Facturador SUNAT"
             SfsPrepared = False
         End If
     Else
@@ -131,7 +131,7 @@ Public Function SfsIsRunning() As Boolean
     End If
 End Function
 
-' Cuando se crea un nuevo documento JSON en DATA, lo registra en BDFacturador.db
+' Carga en BDFacturador.db los archivos json que se encuentran en la carpeta DATA
 Public Sub RefreshSfsScreen()
     Dim EndPoint As String
     EndPoint = "http://localhost:" & Prop.Sfs.Port & "/api/ActualizarPantalla.htm"

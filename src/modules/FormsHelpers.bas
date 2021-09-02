@@ -127,29 +127,29 @@ Private Function IsAlphanumeric(KeyAscii As Variant) As Boolean
     IsAlphanumeric = KeyIsNumber Or KeyIsLowercase Or KeyIsUppercase
 End Function
 
-Public Sub FrmInvoiceCalculateTotals()
+Public Sub FrmDocumentCalculateTotals()
     Dim TypeCurrency As String
     Dim TotalPrice As Double
     Dim SubTotal As Double
     Dim Igv As Double
 
-    TotalPrice = FrmInvoiceSumTotalItems
+    TotalPrice = FrmDocumentSumTotalItems
     SubTotal = TotalPrice / (Prop.Rate.Igv + 1)
     Igv = TotalPrice - SubTotal
 
-    frmInvoice.lblSubTotal = Format(SubTotal, "#,##0.00")
-    frmInvoice.lblIGV = Format(Igv, "#,##0.00")
-    frmInvoice.lblTotal = Format(TotalPrice, "#,##0.00")
+    frmDocument.lblSubTotal = Format(SubTotal, "#,##0.00")
+    frmDocument.lblIGV = Format(Igv, "#,##0.00")
+    frmDocument.lblTotal = Format(TotalPrice, "#,##0.00")
 
-    TypeCurrency = IIf(frmInvoice.cboTypeCurrency = "Soles", "PEN", "USD")
-    frmInvoice.lblTotalInLetters.Caption = "SON: " & AmountInLetters(TotalPrice, TypeCurrency)
+    TypeCurrency = IIf(frmDocument.cboTypeCurrency = "Soles", "PEN", "USD")
+    frmDocument.lblTotalInLetters.Caption = "SON: " & AmountInLetters(TotalPrice, TypeCurrency)
 End Sub
 
-Public Function FrmInvoiceSumTotalItems() As Double
+Public Function FrmDocumentSumTotalItems() As Double
     Dim Sum As Double
     Dim Index As Integer
 
-    With frmInvoice.lstItems
+    With frmDocument.lstItems
         If .ListCount < 1 Then
             Sum = 0
         Else
@@ -159,42 +159,7 @@ Public Function FrmInvoiceSumTotalItems() As Double
         End If
     End With
 
-    FrmInvoiceSumTotalItems = Sum
-End Function
-
-Public Sub FrmNoteCalculateTotals()
-    Dim TypeCurrency As String
-    Dim TotalPrice As Double
-    Dim SubTotal As Double
-    Dim Igv As Double
-
-    TotalPrice = FrmNoteSumTotalItems
-    SubTotal = TotalPrice / (Prop.Rate.Igv + 1)
-    Igv = TotalPrice - SubTotal
-
-    frmNote.lblSubTotal = Format(SubTotal, "#,##0.00")
-    frmNote.lblIGV = Format(Igv, "#,##0.00")
-    frmNote.lblTotal = Format(TotalPrice, "#,##0.00")
-
-    TypeCurrency = IIf(frmNote.cboTypeCurrency = "Soles", "PEN", "USD")
-    frmNote.lblTotalInLetters.Caption = "SON: " & AmountInLetters(TotalPrice, TypeCurrency)
-End Sub
-
-Public Function FrmNoteSumTotalItems() As Double
-    Dim Sum As Double
-    Dim Index As Integer
-
-    With frmNote.lstItems
-        If .ListCount < 1 Then
-            Sum = 0
-        Else
-            For Index = 0 To .ListCount - 1
-                Sum = Sum + .List(Index, 3)
-            Next Index
-        End If
-    End With
-
-    FrmNoteSumTotalItems = Sum
+    FrmDocumentSumTotalItems = Sum
 End Function
 
 Public Function GetCustomerInfo(Ruc As String) As Dictionary

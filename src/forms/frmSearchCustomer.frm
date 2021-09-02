@@ -50,17 +50,11 @@ Private Sub lstCustomers_DblClick(ByVal Cancel As MSForms.ReturnBoolean)
     On Error Resume Next
     
     If Trim(lstCustomers.Column(0)) <> Empty Or Trim(lstCustomers.Column(1)) <> Empty Then
-        frmInvoice.txtCustomerDocNumber = Trim(lstCustomers.Column(0))
-        frmInvoice.txtCustomerName = Trim(lstCustomers.Column(1))
-        frmInvoice.txtCustomerDocType = Trim(lstCustomers.Column(2))
-        frmInvoice.txtCustomerAddress = Trim(lstCustomers.Column(3))
-        frmInvoice.txtCustomerUbigeo = Trim(lstCustomers.Column(4))
-        
-        frmNote.txtCustomerDocNumber = Trim(lstCustomers.Column(0))
-        frmNote.txtCustomerName = Trim(lstCustomers.Column(1))
-        frmNote.txtCustomerDocType = Trim(lstCustomers.Column(2))
-        frmNote.txtCustomerAddress = Trim(lstCustomers.Column(3))
-        frmNote.txtCustomerUbigeo = Trim(lstCustomers.Column(4))
+        frmDocument.txtCustomerDocNumber = Trim(lstCustomers.Column(0))
+        frmDocument.txtCustomerName = Trim(lstCustomers.Column(1))
+        frmDocument.txtCustomerDocType = Trim(lstCustomers.Column(2))
+        frmDocument.txtCustomerAddress = Trim(lstCustomers.Column(3))
+        frmDocument.txtCustomerUbigeo = Trim(lstCustomers.Column(4))
         
         Unload Me
     End If
@@ -75,19 +69,11 @@ Private Sub cmdAdd_Click()
     End If
     
     With lstCustomers
-        frmInvoice.txtCustomerDocNumber = Trim(.List(.ListIndex, 0))
-        frmInvoice.txtCustomerName = Trim(.List(.ListIndex, 1))
-        frmInvoice.txtCustomerDocType = Trim(.List(.ListIndex, 2))
-        frmInvoice.txtCustomerAddress = Trim(.List(.ListIndex, 3))
-        frmInvoice.txtCustomerUbigeo = Trim(.List(.ListIndex, 4))
-    End With
-    
-    With lstCustomers
-        frmNote.txtCustomerDocNumber = Trim(.List(.ListIndex, 0))
-        frmNote.txtCustomerName = Trim(.List(.ListIndex, 1))
-        frmNote.txtCustomerDocType = Trim(.List(.ListIndex, 2))
-        frmNote.txtCustomerAddress = Trim(.List(.ListIndex, 3))
-        frmNote.txtCustomerUbigeo = Trim(.List(.ListIndex, 4))
+        frmDocument.txtCustomerDocNumber = Trim(.List(.ListIndex, 0))
+        frmDocument.txtCustomerName = Trim(.List(.ListIndex, 1))
+        frmDocument.txtCustomerDocType = Trim(.List(.ListIndex, 2))
+        frmDocument.txtCustomerAddress = Trim(.List(.ListIndex, 3))
+        frmDocument.txtCustomerUbigeo = Trim(.List(.ListIndex, 4))
     End With
     
     Unload Me
