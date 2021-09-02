@@ -165,5 +165,3 @@ End Function
 Private Sub cmdCancel_Click()
     Unload Me
 End Sub
-
-

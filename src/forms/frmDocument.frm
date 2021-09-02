@@ -1,5 +1,5 @@
 VERSION 5.00
-Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmDocument 
+Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmDocument
    ClientHeight    =   6525
    ClientLeft      =   45
    ClientTop       =   390
@@ -16,7 +16,7 @@ Option Explicit
 
 Private Sub cboDocSerie_Change()
     On Error Resume Next
-    
+
     If txtDocType = "01" Then
         txtDocNumber = NextCorrelativeNumber(cboDocSerie)
     ElseIf txtDocType = "03" Then
@@ -26,7 +26,7 @@ Private Sub cboDocSerie_Change()
     ElseIf txtDocType = "08" Then
         txtDocNumber = NextCorrelativeNumber(cboDocSerie)
     End If
-    
+
     If Left(cboDocSerie, 1) = "F" Then
         lblCustomerDocType = "RUC:"
     ElseIf Left(cboDocSerie, 1) = "B" Then
@@ -36,11 +36,11 @@ End Sub
 
 Private Sub cmdReferenceDocument_Click()
     If txtDocType = "07" Then
-        frmReferenceDocument.cboMotive.List = Array("Anulación de la operación", "Anulación por error en el RUC", "Corrección por error en la descripción", "Descuento global", "Descuento por ítem", "Devolución total", "Devolución por ítem", "Bonificación", "Disminución en el valor", "Otros Conceptos")
+        frmReferenceDocument.cboMotive.List = Array("Anulaciï¿½n de la operaciï¿½n", "Anulaciï¿½n por error en el RUC", "Correcciï¿½n por error en la descripciï¿½n", "Descuento global", "Descuento por ï¿½tem", "Devoluciï¿½n total", "Devoluciï¿½n por ï¿½tem", "Bonificaciï¿½n", "Disminuciï¿½n en el valor", "Otros Conceptos")
     ElseIf txtDocType = "08" Then
         frmReferenceDocument.cboMotive.List = Array("Intereses por mora", "Aumento en el valor", "Penalidades / otros conceptos")
     End If
-    
+
     frmReferenceDocument.Show
 End Sub
 
@@ -49,16 +49,16 @@ Private Sub cmdShowDetraction_Click()
         frmDetraction.txtTotal = lblTotal
         frmDetraction.Show
     Else
-        MsgBox "Esta funcionalidad no está disponible en la versión libre. " & _
-               "Para ocultar este botón borre el número de cuenta de detracciones en la hoja Configuración.", vbInformation, "No disponible"
+        MsgBox "Esta funcionalidad no estï¿½ disponible en la versiï¿½n libre. " & _
+               "Para ocultar este botï¿½n borre el nï¿½mero de cuenta de detracciones en la hoja Configuraciï¿½n.", vbInformation, "No disponible"
     End If
 End Sub
 
 Private Sub UserForm_Initialize()
     txtEmissionDate = Format(Date, "dd/mm/yyyy")
-    cboTypeCurrency.List = Array("Soles", "Dólares")
+    cboTypeCurrency.List = Array("Soles", "Dï¿½lares")
     lblIGVTitle = "IGV " & Format(Prop.Rate.Igv * 100) & "%:"
-    
+
     If Prop.App.Env = EnvProduction Then
         txtCustomerAddress.Visible = False
         txtCustomerUbigeo.Visible = False
@@ -86,7 +86,7 @@ End Sub
 
 Private Sub lstItems_KeyDown(ByVal KeyCode As MSForms.ReturnInteger, ByVal Shift As Integer)
     On Error Resume Next
-    
+
     If lstItems.ListCount < 1 Then Exit Sub
 
     If KeyCode = 46 Then
@@ -99,13 +99,13 @@ End Sub
 
 Private Function GetReferenceDocument(Data As String) As Dictionary
     Dim ReferenceDocument As New Dictionary
-    
+
     ReferenceDocument.Add "DocType", Split(Data, "-")(0)
     ReferenceDocument.Add "DocSerie", Split(Data, "-")(1)
     ReferenceDocument.Add "DocNumber", Split(Data, "-")(2)
     ReferenceDocument.Add "MotiveCode", Split(Data, "-")(3)
     ReferenceDocument.Add "Motive", Split(Data, "-")(4)
-    
+
     Set GetReferenceDocument = ReferenceDocument
 End Function
 
@@ -122,85 +122,87 @@ Private Sub cmdSave_Click()
     Dim Answer As Integer
     Dim OperationCode As String
     Dim FileName As String
-    
+
     Dim NoteInfo As New NoteInfoEntity
     Dim RefDocument As DocumentEntity
     Dim ReferenceDocument As New Dictionary
     Dim RefDocId As String
-    
+
     If Not ValidFields Then Exit Sub
-    
+
     If CDate(txtEmissionDate) < Date Then
-        Answer = MsgBox("La fecha de emisión debería ser el día de hoy (" & Format(Date, "dd/mm/yyyy") & "). " & _
-               "Si de todas formas desea continuar con la emisión, se recomienda utilizar una serie especial " & _
-               "para la emisión de comprobantes con fecha anterior, esto con el fin de mantener el correlativo de fecha y numeración." & Chr(13) & Chr(13) & _
-               "¿Desea continuar con la emisión del comprobante?", vbYesNo + vbQuestion, "Fecha anterior")
+        Answer = MsgBox("La fecha de emisiï¿½n deberï¿½a ser el dï¿½a de hoy (" & Format(Date, "dd/mm/yyyy") & "). " & _
+               "Si de todas formas desea continuar con la emisiï¿½n, se recomienda utilizar una serie especial " & _
+               "para la emisiï¿½n de comprobantes con fecha anterior, esto con el fin de mantener el correlativo de fecha y numeraciï¿½n." & Chr(13) & Chr(13) & _
+               "ï¿½Desea continuar con la emisiï¿½n del comprobante?", vbYesNo + vbQuestion, "Fecha anterior")
         If Answer = vbNo Then Exit Sub
     End If
-    
+
     If txtDocType = "07" Or txtDocType = "08" Then
         If Not ValidNoteFields Then Exit Sub
-        
+
         Set ReferenceDocument = GetReferenceDocument(txtReferenceDocument)
-        
+
         RefDocId = ReferenceDocument("DocType") & "-" & ReferenceDocument("DocSerie") & "-" & Format(ReferenceDocument("DocNumber"), "00000000")
-        
+
         Set RefDocument = DocumentRepo.GetItem(RefDocId)
         If RefDocument Is Nothing Then
             MsgBox "El comprobante " & RefDocId & " que quiere modificar no existe. " & _
                    "Para modificar un comprobante, debe estar emitido y aceptado.", vbExclamation, "El comprobante no existe"
             Exit Sub
         End If
-        
+
         If Not RefDocument.IsAccepted Then
-            MsgBox "El comprobante " & RefDocId & " que pretende modificar debe tener la situación " & _
-                   """Enviado y Aceptado"".", vbExclamation, "No cumple condición"
+            MsgBox "El comprobante " & RefDocId & " que pretende modificar debe tener la situaciï¿½n " & _
+                   """Enviado y Aceptado"".", vbExclamation, "No cumple condiciï¿½n"
             Exit Sub
         End If
-        
+
         NoteInfo.RefDocEmission = RefDocument.Emission
         NoteInfo.RefDocType = RefDocument.DocType
         NoteInfo.RefDocSerie = RefDocument.DocSerie
         NoteInfo.RefDocNumber = RefDocument.DocNumber
         NoteInfo.MotiveCode = ReferenceDocument("MotiveCode")
         NoteInfo.Motive = ReferenceDocument("Motive")
-        
+
         Set Document.NoteInfo = NoteInfo
     End If
-    
-    OperationCode = "0101"
-    
+
     Document.Emission = CDate(txtEmissionDate)
     Document.EmissionTime = Time
     Document.TypeCurrency = IIf(Trim(cboTypeCurrency) = "Soles", "PEN", "USD")
     Document.DocType = txtDocType
     Document.DocSerie = Trim(cboDocSerie)
     Document.DocNumber = Trim(txtDocNumber)
-    
+
     If txtCustomerDocNumber <> Empty Then
         Customer.DocType = txtCustomerDocType
         Customer.DocNumber = txtCustomerDocNumber
         Customer.Name = txtCustomerName
         Customer.Address = txtCustomerAddress
         Customer.Ubigeo = txtCustomerUbigeo
-        
+
         Set Document.Customer = Customer
     End If
-    
+
+    OperationCode = "0101"
+
     If txtDetractionData <> Empty Then
         Detraction.Code = Split(txtDetractionData, "-")(0)
         Detraction.Percentage = Split(txtDetractionData, "-")(1)
         Detraction.Amount = Split(txtDetractionData, "-")(2)
         Detraction.PaymentMethod = Split(txtDetractionData, "-")(3)
-        
+
         OperationCode = "1001"
+        If Detraction.Code = "004" Then OperationCode = "1002"
+        If Detraction.Code = "028" Then OperationCode = "1003"
         If Detraction.Code = "027" Then OperationCode = "1004"
-        
+
         Set Document.Detraction = Detraction
     End If
-    
+
     Document.OperationCode = OperationCode
-    
+
     With lstItems
         For Index = 0 To .ListCount - 1
             Set Item = New ItemEntity
@@ -210,138 +212,138 @@ Private Sub cmdSave_Click()
             Item.Quantity = Trim(.List(Index, 1))
             Item.UnitValue = TaxLess(Trim(.List(Index, 2)), Prop.Rate.Igv)
             Item.IgvRate = Prop.Rate.Igv
-            
+
             Document.AddItem Item
         Next Index
     End With
-    
+
     DocumentNumber = Document.DocType & "-" & Document.DocSerie & "-" & Format(Document.DocNumber, "00000000")
     DocumentExists = GetMatchRow(sheetDocuments, 1, DocumentNumber) > 0
     If DocumentExists Then
         MsgBox "No puede emitir la " & Document.GetName & " " & DocumentNumber & " porque ya fue emitida anteriormente.", vbExclamation, "Duplicado"
         Exit Sub
     End If
-    
+
     CreateDocumentJsonFile Document
     RefreshSfsScreen
     GenerateElectronicDocument Document.DocType, Document.DocSerie & "-" & Format(Document.DocNumber, "00000000")
-    
+
     ElectronicDocumentGenerated = ElectronicDocumentExists(Prop.Company.Ruc & "-" & DocumentNumber & ".zip")
     If ElectronicDocumentGenerated Then
-        MsgBox "La " & Document.GetName & " se generó correctamente.", vbInformation, "Comprobante generado"
-        InfoLog "El comprobante electrónico " & DocumentNumber & " se generó correctamente.", "frmDocument.cmdSave_Click"
-        
+        MsgBox "La " & Document.GetName & " se generï¿½ correctamente.", vbInformation, "Comprobante generado"
+        InfoLog "El comprobante electrï¿½nico " & DocumentNumber & " se generï¿½ correctamente.", "frmDocument.cmdSave_Click"
+
         FileName = Prop.Company.Ruc & "-" & Document.Id
         Document.Situation = GetSituationFromCode(DbGetDocumentSituation(FileName))
         Document.Observation = DbGetDocumentObservation(FileName)
-        
+
         DocumentRepo.Add Document
-        
+
         CreatePdf Document
-        
+
         If Prop.App.Premium And Prop.Email.SendWhenEmit And Document.DocType = "01" Then
             Run "ShowFrmSendEmail", Document.Id
         End If
-        
+
         OpenPdf DocumentNumber
     Else
         MsgBox "Error al generar la " & Document.GetName & " " & DocumentNumber, vbCritical, "ERROR"
-        ErrorLog "Error al generar el comprobante electrónico " & DocumentNumber, "frmDocument.cmdSave_Click"
+        ErrorLog "Error al generar el comprobante electrï¿½nico " & DocumentNumber, "frmDocument.cmdSave_Click"
     End If
-    
+
     SaveLastSerialNumber
-    
+
     ThisWorkbook.Save
     Unload Me
 End Sub
 
 Private Function ValidFields() As Boolean
     If Not IsValidDate(txtEmissionDate) Then
-        MsgBox "Ingrese una fecha de emisión válida. El formato de fecha es dd/mm/yyyy.", vbExclamation, "Subsane la observación"
+        MsgBox "Ingrese una fecha de emisiï¿½n vï¿½lida. El formato de fecha es dd/mm/yyyy.", vbExclamation, "Subsane la observaciï¿½n"
         txtEmissionDate.SetFocus
         Exit Function
     End If
     If Date - CDate(txtEmissionDate) > 7 Then
-        MsgBox "La fecha del comprobante no puede ser anterior a siete días.", vbExclamation, "Subsane la observación"
+        MsgBox "La fecha del comprobante no puede ser anterior a siete dï¿½as.", vbExclamation, "Subsane la observaciï¿½n"
         txtEmissionDate.SetFocus
         Exit Function
     End If
     If CDate(txtEmissionDate) > Date Then
-        MsgBox "La fecha del comprobante no puede ser una fecha posterior.", vbExclamation, "Subsane la observación"
+        MsgBox "La fecha del comprobante no puede ser una fecha posterior.", vbExclamation, "Subsane la observaciï¿½n"
         txtEmissionDate.SetFocus
         Exit Function
     End If
     If Trim(cboDocSerie) = Empty Then
-        MsgBox "Debe ingresar el número de seríe del comprobante.", vbExclamation, "Subsane la observación"
+        MsgBox "Debe ingresar el nï¿½mero de serï¿½e del comprobante.", vbExclamation, "Subsane la observaciï¿½n"
         cboDocSerie.SetFocus
         Exit Function
     End If
     If Trim(txtDocNumber) = Empty Or Not IsNumeric(Trim(txtDocNumber)) Then
-        MsgBox "Debe ingresar el número correlativo del comprobante.", vbExclamation, "Subsane la observación"
+        MsgBox "Debe ingresar el nï¿½mero correlativo del comprobante.", vbExclamation, "Subsane la observaciï¿½n"
         txtDocNumber.SetFocus
         Exit Function
     End If
-    
+
     If txtDocType = "03" And lblTotal > 700 And (Trim(txtCustomerDocNumber) = Empty Or Trim(txtCustomerName) = Empty) Then
-        MsgBox "El total de la venta es mayor a 700 soles. Debe ingresar el DNI y los apellidos y nombres del cliente.", vbExclamation, "Subsane la observación"
+        MsgBox "El total de la venta es mayor a 700 soles. Debe ingresar el DNI y los apellidos y nombres del cliente.", vbExclamation, "Subsane la observaciï¿½n"
         cmdSearchCustomer.SetFocus
         Exit Function
     End If
     If Left(cboDocSerie, 1) = "F" And txtCustomerDocType = "1" Then
-        MsgBox "El documento de identificación del cliente debe ser un RUC, no un DNI", vbExclamation, "Subsane la observación"
+        MsgBox "El documento de identificaciï¿½n del cliente debe ser un RUC, no un DNI", vbExclamation, "Subsane la observaciï¿½n"
         cmdSearchCustomer.SetFocus
         Exit Function
     End If
     If Left(cboDocSerie, 1) = "B" And txtCustomerDocType = "6" Then
-        MsgBox "El documento de identificación del cliente debe ser un RUC, no un DNI", vbExclamation, "Subsane la observación"
+        MsgBox "El documento de identificaciï¿½n del cliente debe ser un RUC, no un DNI", vbExclamation, "Subsane la observaciï¿½n"
         cmdSearchCustomer.SetFocus
         Exit Function
     End If
     If txtDocType = "01" And (Trim(txtCustomerDocNumber) = Empty Or Trim(txtCustomerName) = Empty) Then
-        MsgBox "Debe ingresar el RUC y el nombre del cliente.", vbExclamation, "Subsane la observación"
+        MsgBox "Debe ingresar el RUC y el nombre del cliente.", vbExclamation, "Subsane la observaciï¿½n"
         cmdSearchCustomer.SetFocus
         Exit Function
     End If
     If txtCustomerDocType = "6" And Len(txtCustomerDocNumber) <> 11 Then
-        MsgBox "El número de RUC debe tener 11 dígitos.", vbExclamation, "Subsane la observación"
+        MsgBox "El nï¿½mero de RUC debe tener 11 dï¿½gitos.", vbExclamation, "Subsane la observaciï¿½n"
         cmdSearchCustomer.SetFocus
         Exit Function
     End If
     If txtCustomerDocType = "1" And txtCustomerDocNumber <> Empty And Len(txtCustomerDocNumber) <> 8 Then
-        MsgBox "El número de DNI debe tener 8 dígitos.", vbExclamation, "Subsane la observación"
+        MsgBox "El nï¿½mero de DNI debe tener 8 dï¿½gitos.", vbExclamation, "Subsane la observaciï¿½n"
         cmdSearchCustomer.SetFocus
         Exit Function
     End If
-    
+
     If lstItems.ListCount < 1 Then
-        MsgBox "Debe ingresar al menos un producto o servicio.", vbExclamation, "Subsane la observación"
+        MsgBox "Debe ingresar al menos un producto o servicio.", vbExclamation, "Subsane la observaciï¿½n"
         Exit Function
     End If
     If (txtDocType = "01" Or txtDocType = "03") And lblTotal = 0 Then
-        MsgBox "El total debe ser mayor a cero.", vbExclamation, "Subsane la observación"
+        MsgBox "El total debe ser mayor a cero.", vbExclamation, "Subsane la observaciï¿½n"
         Exit Function
     End If
-    
+
     ValidFields = True
 End Function
 
 Private Function ValidNoteFields() As Boolean
     If CharCount(txtReferenceDocument, "-") <> 4 Then
-        MsgBox "Debe ingresar los datos del documento que modifica.", vbExclamation, "Subsane la observación"
+        MsgBox "Debe ingresar los datos del documento que modifica.", vbExclamation, "Subsane la observaciï¿½n"
         cmdReferenceDocument.SetFocus
         Exit Function
     End If
     If Left(cboDocSerie, 1) = "F" And Mid(txtReferenceDocument, 4, 1) = "B" Then
-        MsgBox "El tipo de documento modificado por la Nota debe ser una Factura y la serie debe comenzar con F.", vbInformation, "Subsane la observación"
+        MsgBox "El tipo de documento modificado por la Nota debe ser una Factura y la serie debe comenzar con F.", vbInformation, "Subsane la observaciï¿½n"
         cmdReferenceDocument.SetFocus
         Exit Function
     End If
     If Left(cboDocSerie, 1) = "B" And Mid(txtReferenceDocument, 4, 1) = "F" Then
-        MsgBox "El tipo de documento modificado por la Nota debe ser una Boleta de Venta y la serie debe comenzar con B.", vbInformation, "Subsane la observación"
+        MsgBox "El tipo de documento modificado por la Nota debe ser una Boleta de Venta y la serie debe comenzar con B.", vbInformation, "Subsane la observaciï¿½n"
         cmdReferenceDocument.SetFocus
         Exit Function
     End If
-    
+
     ValidNoteFields = True
 End Function
 
