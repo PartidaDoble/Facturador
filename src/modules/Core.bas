@@ -73,6 +73,9 @@ Public Function DocumentToJson(Document As DocumentEntity, Optional Pretty As Bo
     Dim Leyendas As New Collection
     Dim Leyenda As Dictionary
     Dim DatoPago As Dictionary
+    Dim DetallePago As Collection
+    Dim CuotaPago As Dictionary
+    Dim Installment As InstallmentEntity
     
     Cabecera.Add "tipOperacion", Document.OperationCode
     Cabecera.Add "fecEmision", Format(Document.Emission, "yyyy-mm-dd")
@@ -172,13 +175,30 @@ Public Function DocumentToJson(Document As DocumentEntity, Optional Pretty As Bo
         DatoPago.Add "formaPago", Document.WayPay.Way
         DatoPago.Add "mtoNetoPendientePago", Format(Document.WayPay.NetAmountPending, "0.00")
         DatoPago.Add "tipMonedaMtoNetoPendientePago", Document.WayPay.TypeCurrency
+        
+        If Document.WayPay.Installments.Count > 0 Then
+            Set DetallePago = New Collection
+            For Each Installment In Document.WayPay.Installments
+                Set CuotaPago = New Dictionary
+                CuotaPago.Add "mtoCuotaPago", Format(Installment.Amount, "0.00")
+                CuotaPago.Add "fecCuotaPago", Format(Installment.PaymentDate, "yyyy-mm-dd")
+                CuotaPago.Add "tipMonedaCuotaPago", Installment.TypeCurrency
+                
+                DetallePago.Add CuotaPago
+            Next Installment
+        End If
     End If
     
     Data.Add "cabecera", Cabecera
     Data.Add "detalle", Detalle
     Data.Add "tributos", Tributos
     Data.Add "leyendas", Leyendas
-    Data.Add "datoPago", DatoPago
+    If Not DatoPago Is Nothing Then
+        Data.Add "datoPago", DatoPago
+    End If
+    If Not DetallePago Is Nothing Then
+        Data.Add "detallePago", DetallePago
+    End If
     
     If Pretty Then
         DocumentToJson = ConvertToJson(Data, 2)
