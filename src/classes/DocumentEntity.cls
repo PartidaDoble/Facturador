@@ -29,6 +29,8 @@ Public NoteInfo As NoteInfoEntity
 
 Public Detraction As DetractionEntity
 
+Public WayPay As WayPayEntity
+
 Private pItems As New Collection
 
 

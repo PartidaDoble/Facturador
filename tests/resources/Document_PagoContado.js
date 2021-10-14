@@ -20,11 +20,6 @@ const invoice = {
     sumImpVenta: "118.00",
     ublVersionId: "2.1",
     customizationId: "2.0",
-    adicionalCabecera: {
-      codPaisCliente: "PE",
-      codUbigeoCliente: "210801",
-      desDireccionCliente: "JR. TACNA NRO. 562",
-    },
   },
   detalle: [
     {
@@ -62,12 +57,17 @@ const invoice = {
       codLeyenda: "1000",
       desLeyenda: "CIENTO DIECIOCHO CON 00/100 SOLES",
     }
-  ]
+  ],
+  datoPago: {
+    formaPago: "Contado",
+    mtoNetoPendientePago: "0.00",
+    tipMonedaMtoNetoPendientePago: "PEN"
+  }
 }
 
 console.log(JSON.stringify(invoice));
 
-const {cabecera, detalle, tributos, leyendas} = invoice;
+const {cabecera, detalle, tributos, leyendas, datoPago} = invoice;
 console.log();
 console.log(quoteToDoubleQuote(JSON.stringify({cabecera})));
 console.log();
@@ -76,3 +76,5 @@ console.log();
 console.log(quoteToDoubleQuote(JSON.stringify({tributos})));
 console.log();
 console.log(quoteToDoubleQuote(JSON.stringify({leyendas})));
+console.log();
+console.log(quoteToDoubleQuote(JSON.stringify({datoPago})));

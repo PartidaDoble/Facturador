@@ -405,3 +405,51 @@ Sub CanceledDocumentsToJson_FacturaYNota()
         .AssertEquals Expected, CanceledDocumentsToJson(Documents, CDate("31/08/2021"), False)
     End With
 End Sub
+
+Private Sub DocumentToJson_Invoice_PagoContado()
+    Dim Expected As String
+    Dim Cabecera As String
+    Dim Detalle As String
+    Dim Tributos As String
+    Dim Leyendas As String
+    Dim DatoPago As String
+    Dim Document As New DocumentEntity
+    Dim Customer As New CustomerEntity
+    Dim Item As New ItemEntity
+    Dim WayPay As New WayPayEntity
+    
+    Document.OperationCode = "0101"
+    Document.Emission = CDate("31/08/2021")
+    Document.EmissionTime = TimeValue("10:20:14")
+    Document.TypeCurrency = "PEN"
+    
+    Customer.DocType = "6"
+    Customer.DocNumber = "20131380951"
+    Customer.Name = "CLIENTE SAC"
+    Set Document.Customer = Customer
+    
+    Item.ProductCode = "10000"
+    Item.UnitMeasure = "NIU"
+    Item.Description = "Producto 1"
+    Item.Quantity = 2
+    Item.UnitValue = 50
+    Item.IgvRate = 0.18
+    Document.AddItem Item
+    
+    WayPay.Way = "Contado"
+    WayPay.NetAmountPending = "0.00"
+    WayPay.TypeCurrency = "PEN"
+    
+    Set Document.WayPay = WayPay
+    
+    Cabecera = """cabecera"":{""tipOperacion"":""0101"",""fecEmision"":""2021-08-31"",""horEmision"":""10:20:14"",""fecVencimiento"":""-"",""codLocalEmisor"":""0000"",""tipDocUsuario"":""6"",""numDocUsuario"":""20131380951"",""rznSocialUsuario"":""CLIENTE SAC"",""tipMoneda"":""PEN"",""sumTotTributos"":""18.00"",""sumTotValVenta"":""100.00"",""sumPrecioVenta"":""118.00"",""sumDescTotal"":""0.00"",""sumOtrosCargos"":""0.00"",""sumTotalAnticipos"":""0.00"",""sumImpVenta"":""118.00"",""ublVersionId"":""2.1"",""customizationId"":""2.0""}"
+    Detalle = """detalle"":[{""codUnidadMedida"":""NIU"",""ctdUnidadItem"":""2.00"",""codProducto"":""10000"",""codProductoSUNAT"":""-"",""desItem"":""Producto 1"",""mtoValorUnitario"":""50.00000000"",""sumTotTributosItem"":""18.00"",""codTriIGV"":""1000"",""mtoIgvItem"":""18.00"",""mtoBaseIgvItem"":""100.00"",""nomTributoIgvItem"":""IGV"",""codTipTributoIgvItem"":""VAT"",""tipAfeIGV"":""10"",""porIgvItem"":""18.00"",""mtoPrecioVentaUnitario"":""59.00"",""mtoValorVentaItem"":""100.00""}]"
+    Tributos = """tributos"":[{""ideTributo"":""1000"",""nomTributo"":""IGV"",""codTipTributo"":""VAT"",""mtoBaseImponible"":""100.00"",""mtoTributo"":""18.00""}]"
+    Leyendas = """leyendas"":[{""codLeyenda"":""1000"",""desLeyenda"":""CIENTO DIECIOCHO CON 00/100 SOLES""}]"
+    DatoPago = """datoPago"":{""formaPago"":""Contado"",""mtoNetoPendientePago"":""0.00"",""tipMonedaMtoNetoPendientePago"":""PEN""}"
+    Expected = "{" & Cabecera & "," & Detalle & "," & Tributos & "," & Leyendas & "," & DatoPago & "}"
+    
+    With Test.It("Document_ConUnItem")
+        .AssertEquals Expected, DocumentToJson(Document, False)
+    End With
+End Sub
