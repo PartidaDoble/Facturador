@@ -45,14 +45,9 @@ Private Sub cmdReferenceDocument_Click()
 End Sub
 
 Private Sub cmdShowDetraction_Click()
-    If Prop.App.Premium Then
-        frmDetraction.txtTotal = lblTotal
-        frmDetraction.txtCurrencySymbol = IIf(cboTypeCurrency = "Soles", "S/", "US$")
-        frmDetraction.Show
-    Else
-        MsgBox "Esta funcionalidad no está disponible en la versión libre. " & _
-               "Para ocultar este botón borre el número de cuenta de detracciones en la hoja Configuración.", vbInformation, "No disponible"
-    End If
+    frmDetraction.txtTotal = lblTotal
+    frmDetraction.txtCurrencySymbol = IIf(cboTypeCurrency = "Soles", "S/", "US$")
+    frmDetraction.Show
 End Sub
 
 Private Sub optCredit_Click()
