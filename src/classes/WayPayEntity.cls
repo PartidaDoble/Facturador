@@ -16,3 +16,7 @@ Public NetAmountPending As Double
 Public TypeCurrency As String
 
 Public Installments As New Collection
+
+Property Get CurrencySymbol() As String
+    CurrencySymbol = IIf(TypeCurrency = "PEN", "S/", "US$")
+End Property

@@ -23,25 +23,25 @@ Private Sub cmdAdd_Click()
     If Not ValidFields Then Exit Sub
     
     frmDocument.txtPaymentData = Join(Array("Credito", Format(CDbl(txtNetAmountPending), "0.00"), txtTypeCurrency), "-")
-    frmDocument.lblNetAmountPending = IIf(txtTypeCurrency = "PEN", "S/ ", "USD ") & txtNetAmountPending
+    frmDocument.lblNetAmountPending = IIf(txtTypeCurrency = "PEN", "S/ ", "US$ ") & txtNetAmountPending
     
     If txtAmount1 <> Empty And txtPaymentDate1 <> Empty Then
         Installment1 = Join(Array(Format(CDbl(txtAmount1), "0.00"), txtPaymentDate1, txtTypeCurrency), "-")
         frmDocument.lblInstallment1.Visible = True
         frmDocument.lblInstallmentDate1 = txtPaymentDate1
-        frmDocument.lblInstallmentAmount1 = IIf(txtTypeCurrency = "PEN", "S/ ", "USD ") & txtAmount1
+        frmDocument.lblInstallmentAmount1 = IIf(txtTypeCurrency = "PEN", "S/ ", "US$ ") & txtAmount1
     End If
     If txtAmount2 <> Empty And txtPaymentDate2 <> Empty Then
         Installment2 = Join(Array(Format(CDbl(txtAmount2), "0.00"), txtPaymentDate2, txtTypeCurrency), "-")
         frmDocument.lblInstallment2.Visible = True
         frmDocument.lblInstallmentDate2 = txtPaymentDate2
-        frmDocument.lblInstallmentAmount2 = IIf(txtTypeCurrency = "PEN", "S/ ", "USD ") & txtAmount2
+        frmDocument.lblInstallmentAmount2 = IIf(txtTypeCurrency = "PEN", "S/ ", "US$ ") & txtAmount2
     End If
     If txtAmount3 <> Empty And txtPaymentDate3 <> Empty Then
         Installment3 = Join(Array(Format(CDbl(txtAmount3), "0.00"), txtPaymentDate3, txtTypeCurrency), "-")
         frmDocument.lblInstallment3.Visible = True
         frmDocument.lblInstallmentDate3 = txtPaymentDate3
-        frmDocument.lblInstallmentAmount3 = IIf(txtTypeCurrency = "PEN", "S/ ", "USD ") & txtAmount3
+        frmDocument.lblInstallmentAmount3 = IIf(txtTypeCurrency = "PEN", "S/ ", "US$ ") & txtAmount3
     End If
     
     frmDocument.txtPaymentDetail = Join(Array(Installment1, Installment2, Installment3), "|")

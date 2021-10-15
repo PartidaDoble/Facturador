@@ -14,3 +14,7 @@ Public PaymentDate As Date
 Public Amount As Double
 
 Public TypeCurrency As String
+
+Property Get CurrencySymbol() As String
+    CurrencySymbol = IIf(TypeCurrency = "PEN", "S/", "US$")
+End Property
