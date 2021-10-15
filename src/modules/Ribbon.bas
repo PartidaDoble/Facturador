@@ -11,6 +11,7 @@ Public Sub EmitInvoice(Control As IRibbonControl)
     frmDocument.txtDocNumber = NextCorrelativeNumber(sheetSetting.Range("O1"))
     frmDocument.lblCustomerDocType = "RUC:"
     frmDocument.cmdReferenceDocument.Visible = False
+    frmDocument.optCash = True
     
     If Trim(Prop.Company.NroCtaDetraction) = Empty Then
         frmDocument.cmdShowDetraction.Visible = False
@@ -30,6 +31,7 @@ Public Sub EmitBoleta(Control As IRibbonControl)
     frmDocument.lblCustomerDocType = "DNI:"
     frmDocument.cmdShowDetraction.Visible = False
     frmDocument.cmdReferenceDocument.Visible = False
+    frmDocument.fmeWayPay.Visible = False
     
     frmDocument.Show
 End Sub
@@ -41,6 +43,7 @@ Public Sub EmitCreditNote(Control As IRibbonControl)
     frmDocument.cboDocSerie.List = CollectionToArray(GetCreditNoteSeries)
     frmDocument.txtDocType = "07"
     frmDocument.cmdShowDetraction.Visible = False
+    frmDocument.fmeWayPay.Visible = False
     
     frmDocument.Show
 End Sub
@@ -52,6 +55,7 @@ Public Sub EmitDebitNote(Control As IRibbonControl)
     frmDocument.cboDocSerie.List = CollectionToArray(GetDebitNoteSeries)
     frmDocument.txtDocType = "08"
     frmDocument.cmdShowDetraction.Visible = False
+    frmDocument.fmeWayPay.Visible = False
     
     frmDocument.Show
 End Sub

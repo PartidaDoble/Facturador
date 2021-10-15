@@ -1,6 +1,6 @@
 VERSION 5.00
 Begin {C62A69F0-16DC-11CE-9E98-00AA00574A4F} frmDocument 
-   ClientHeight    =   6525
+   ClientHeight    =   8505.001
    ClientLeft      =   45
    ClientTop       =   390
    ClientWidth     =   10155
@@ -47,6 +47,7 @@ End Sub
 Private Sub cmdShowDetraction_Click()
     If Prop.App.Premium Then
         frmDetraction.txtTotal = lblTotal
+        frmDetraction.txtCurrencySymbol = IIf(cboTypeCurrency = "Soles", "S/", "US$")
         frmDetraction.Show
     Else
         MsgBox "Esta funcionalidad no está disponible en la versión libre. " & _
@@ -54,10 +55,25 @@ Private Sub cmdShowDetraction_Click()
     End If
 End Sub
 
+Private Sub optCredit_Click()
+    frmCreditInfo.txtEmissionDate = txtEmissionDate
+    frmCreditInfo.txtTypeCurrency = IIf(cboTypeCurrency = "Soles", "PEN", "USD")
+    frmCreditInfo.txtPaymentDate1.SetFocus
+    
+    If txtDetractionData = Empty Then
+        frmCreditInfo.txtNetAmountPending = lblTotal
+    Else
+        frmCreditInfo.txtNetAmountPending = Format(lblTotal - Split(txtDetractionData, "-")(2), "#,##0.00#")
+    End If
+    
+    frmCreditInfo.Show
+End Sub
+
 Private Sub UserForm_Initialize()
     txtEmissionDate = Format(Date, "dd/mm/yyyy")
     cboTypeCurrency.List = Array("Soles", "Dólares")
     lblIGVTitle = "IGV " & Format(Prop.Rate.Igv * 100) & "%:"
+    Height = 384
     
     If Prop.App.Env = EnvProduction Then
         txtCustomerAddress.Visible = False
@@ -65,6 +81,8 @@ Private Sub UserForm_Initialize()
         txtDocType.Visible = False
         txtCustomerDocType.Visible = False
         txtDetractionData.Visible = False
+        txtPaymentData.Visible = False
+        txtPaymentDetail.Visible = False
     End If
 End Sub
 
@@ -115,6 +133,9 @@ Private Sub cmdSave_Click()
     Dim Customer As New CustomerEntity
     Dim Detraction As New DetractionEntity
     Dim Item As ItemEntity
+    Dim WayPay As New WayPayEntity
+    Dim InstallmentData As Variant
+    Dim Installment As InstallmentEntity
     Dim Index As Integer
     Dim DocumentNumber As String
     Dim ElectronicDocumentGenerated As Boolean
@@ -192,6 +213,7 @@ Private Sub cmdSave_Click()
         Detraction.Percentage = Split(txtDetractionData, "-")(1)
         Detraction.Amount = Split(txtDetractionData, "-")(2)
         Detraction.PaymentMethod = Split(txtDetractionData, "-")(3)
+        Detraction.CurrencySymbol = Split(txtDetractionData, "-")(4)
         
         OperationCode = "1001"
         If Detraction.Code = "004" Then OperationCode = "1002"
@@ -216,6 +238,33 @@ Private Sub cmdSave_Click()
             Document.AddItem Item
         Next Index
     End With
+    
+    If Document.DocType = "01" Then
+        If optCash Then
+            WayPay.Way = "Contado"
+            WayPay.NetAmountPending = "0.00"
+            WayPay.TypeCurrency = Document.TypeCurrency
+        End If
+        
+        If optCredit Then
+            WayPay.Way = Split(txtPaymentData, "-")(0)
+            WayPay.NetAmountPending = Split(txtPaymentData, "-")(1)
+            WayPay.TypeCurrency = Split(txtPaymentData, "-")(2)
+            
+            For Each InstallmentData In Split(txtPaymentDetail, "|")
+                If InstallmentData <> Empty Then
+                    Set Installment = New InstallmentEntity
+                    Installment.Amount = Split(InstallmentData, "-")(0)
+                    Installment.PaymentDate = Split(InstallmentData, "-")(1)
+                    Installment.TypeCurrency = Split(InstallmentData, "-")(2)
+                    
+                    WayPay.Installments.Add Installment
+                End If
+            Next InstallmentData
+        End If
+        
+        Set Document.WayPay = WayPay
+    End If
     
     DocumentNumber = Document.DocType & "-" & Document.DocSerie & "-" & Format(Document.DocNumber, "00000000")
     DocumentExists = GetMatchRow(sheetDocuments, 1, DocumentNumber) > 0

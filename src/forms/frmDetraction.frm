@@ -20,10 +20,10 @@ Private Sub cmdAdd_Click()
     
     If Not ValidFields Then Exit Sub
     
-    DetractionData = Join(Array(Left(cboCode, 3), txtPercentage, Format(CDbl(txtAmount), "0.00"), Left(cboPaymentMethod, 3)), "-")
+    DetractionData = Join(Array(Left(cboCode, 3), txtPercentage, Format(CDbl(txtAmount), "0.00"), Left(cboPaymentMethod, 3), txtCurrencySymbol), "-")
     
     frmDocument.txtDetractionData = DetractionData
-    frmDocument.lblDetraction = "OPERACIÓN SUJETA AL SPOT " & txtAmount & " (" & txtPercentage & "%)"
+    frmDocument.lblDetraction = "OPERACIÓN SUJETA AL SPOT " & txtCurrencySymbol & " " & txtAmount & " (" & txtPercentage & "%)"
     Unload Me
 End Sub
 
