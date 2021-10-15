@@ -94,6 +94,7 @@ Private Sub UserForm_Initialize()
     
     If Prop.App.Env = EnvProduction Then
         txtTotal.Visible = False
+        txtCurrencySymbol.Visible = False
     End If
 End Sub
 

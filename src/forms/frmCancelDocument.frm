@@ -33,6 +33,7 @@ Private Sub cboDocType_Change()
 End Sub
 
 Private Sub cmdShowDocument_Click()
+    On Error Resume Next
     Dim DocumentRepo As New DocumentRepository
     Dim Document As DocumentEntity
     Dim DocumentNumber As String
@@ -100,7 +101,7 @@ Private Sub cmdAnular_Click()
                 GoTo EndSub
             End If
         Else
-            MsgBox "Para anular el comprobante " & DocumentNumber & ", previamente debe estar enviado y aceptado.", vbExclamation, "No cumple condición"
+            MsgBox "Para anular el comprobante " & DocumentNumber & ", previamente debe ser enviado y aceptado.", vbExclamation, "No cumple condición"
             GoTo EndSub
         End If
         

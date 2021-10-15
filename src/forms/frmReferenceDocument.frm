@@ -57,6 +57,7 @@ Private Function ValidFields() As Boolean
 End Function
 
 Private Sub cmdShowDocument_Click()
+    On Error Resume Next
     Dim DocumentRepo As New DocumentRepository
     Dim Document As DocumentEntity
     Dim DocumentNumber As String

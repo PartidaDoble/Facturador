@@ -339,7 +339,7 @@ Private Function ValidFields() As Boolean
         Exit Function
     End If
     If Left(cboDocSerie, 1) = "B" And txtCustomerDocType = "6" Then
-        MsgBox "El documento de identificación del cliente debe ser un RUC, no un DNI", vbExclamation, "Subsane la observación"
+        MsgBox "El documento de identificación del cliente debe ser un DNI, no un RUC", vbExclamation, "Subsane la observación"
         cmdSearchCustomer.SetFocus
         Exit Function
     End If

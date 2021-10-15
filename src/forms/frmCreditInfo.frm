@@ -160,3 +160,10 @@ Private Sub txtNetAmountPending_KeyPress(ByVal KeyAscii As MSForms.ReturnInteger
     If InStr(txtNetAmountPending, ".") > 0 And KeyAscii = Asc(".") Then KeyAscii = 0
     KeyAscii = OnlyAmount(KeyAscii)
 End Sub
+
+Private Sub UserForm_Initialize()
+    If Prop.App.Env = EnvProduction Then
+        txtTypeCurrency.Visible = False
+        txtEmissionDate.Visible = False
+    End If
+End Sub
