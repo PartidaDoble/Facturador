@@ -51,6 +51,10 @@ Private Sub cmdShowDetraction_Click()
 End Sub
 
 Private Sub optCredit_Click()
+    ShowFrmCreditInfo
+End Sub
+
+Private Sub ShowFrmCreditInfo()
     frmCreditInfo.txtEmissionDate = txtEmissionDate
     frmCreditInfo.txtTypeCurrency = IIf(cboTypeCurrency = "Soles", "PEN", "USD")
     frmCreditInfo.txtPaymentDate1.SetFocus
@@ -78,6 +82,7 @@ Private Sub UserForm_Initialize()
         txtDetractionData.Visible = False
         txtPaymentData.Visible = False
         txtPaymentDetail.Visible = False
+        txtReferenceDocument.Visible = False
     End If
 End Sub
 
@@ -242,6 +247,12 @@ Private Sub cmdSave_Click()
         End If
         
         If optCredit Then
+            If txtPaymentData = Empty Or txtPaymentDetail = Empty Then
+                MsgBox "Debe ingresar la Informacón del Credito.", vbInformation, "Información de Crédito"
+                ShowFrmCreditInfo
+                Exit Sub
+            End If
+            
             WayPay.Way = Split(txtPaymentData, "-")(0)
             WayPay.NetAmountPending = Split(txtPaymentData, "-")(1)
             WayPay.TypeCurrency = Split(txtPaymentData, "-")(2)
