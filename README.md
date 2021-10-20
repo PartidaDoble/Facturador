@@ -1,15 +1,14 @@
 # Sistema de facturación electrónica - Perú
 
-Principales funcionalidades:
+Características:
 
 1. Emisión de Facturas, Boletas de Venta y Notas de Crédito o Débito electrónicas.
 2. Anulación de comprobantes emitidos.
 3. Envió de comprobantes y resúmenes a la SUNAT.
 4. Consulta de tickets.
-5. Registro de nuevos clientes.
-6. Registro de nuevos productos.
-7. Validaciones para minimizar errores involuntarios.
-8. No hay un límite en el número de comprobantes emitidos.
+5. Emisión de comprobantes sin conección a internet. Sin embargo, para el envío de comprobantes será necesario una conección a internet.
+6. No hay un límite en el número de comprobantes emitidos.
+7. Es de código abierto. Si sabe programar, puede modificar y personalizar la aplicación.
 
 Más información en la [página web](https://partidadoble.github.io/pages/facturador)
 
