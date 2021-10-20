@@ -1,4 +1,4 @@
-# Sistema de facturación electrónica en Excel - Perú
+# Sistema de facturación electrónica - Perú
 
 Principales funcionalidades:
 
