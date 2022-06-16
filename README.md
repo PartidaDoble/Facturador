@@ -8,7 +8,7 @@ Características:
 4. Consulta de tickets.
 5. Emisión de comprobantes sin conección a internet. Sin embargo, para el envío de comprobantes será necesario una conección a internet.
 6. No hay un límite en el número de comprobantes emitidos.
-7. Es de código abierto. Si sabe programar, puede modificar y personalizar la aplicación.
+7. Es de código abierto.
 
 Más información en la [página web](https://partidadoble.github.io/pages/facturador)
 
