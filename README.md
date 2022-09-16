@@ -10,8 +10,6 @@ Características:
 6. No hay un límite en el número de comprobantes emitidos.
 7. Es de código abierto.
 
-Más información en la [página web](https://partidadoble.github.io/pages/facturador)
-
 ![ribbon](https://user-images.githubusercontent.com/22132891/137567440-f6e0845a-7099-4501-99b2-fa98ea43e984.JPG)
 
 ![form](https://user-images.githubusercontent.com/22132891/137567452-c61f2390-dce8-4877-bfd4-3cd878867d2b.JPG)
